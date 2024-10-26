@@ -1,12 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login with Spotify</title>
+    <title>Spotify Profile Viewer</title>
+    <style>
+        .login-container {
+            text-align: center;
+            margin: 50px auto;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        .spotify-button {
+            display: inline-block;
+            background-color: #1DB954;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 24px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .spotify-button:hover {
+            background-color: #1ed760;
+        }
+    </style>
 </head>
 <body>
-    <h1>Login with Spotify</h1>
-    <a href="{% url 'spotify_login' %}">Log in with Spotify</a>
+    <div class="login-container">
+        <h1>Welcome to Spotify Profile Viewer</h1>
+        <p>Connect with your Spotify account to view your profile and top tracks.</p>
+        <a href="{% url 'spotify_login' %}" class="spotify-button">Log in with Spotify</a>
+    </div>
 </body>
 </html>

@@ -6,12 +6,14 @@ import base64
 import urllib.parse
 from django.shortcuts import render, redirect
 
-params = {
-    "client_id": settings.SPOTIFY_CLIENT_ID,
-    "response_type": "code",
-    "redirect_uri": settings.SPOTIFY_REDIRECT_URI,
-    "scope": "user-read-private user-read-email",  # Add additional scopes if needed
-}
+
+def index(request):
+    """
+    View for the home/landing page
+    """
+    return render(request, 'spotify_auth/index.html')
+
+
 def spotify_login(request):
     # Spotify OAuth endpoint
     auth_url = "https://accounts.spotify.com/authorize"
@@ -21,13 +23,10 @@ def spotify_login(request):
         "client_id": settings.SPOTIFY_CLIENT_ID,
         "response_type": "code",
         "redirect_uri": settings.SPOTIFY_REDIRECT_URI,
-        "scope": "user-read-private user-read-email",  # Adjust scopes as needed
+        "scope": "user-read-private user-read-email user-top-read",  # Added user-top-read scope
     }
     # Redirect to Spotify's login page
     return redirect(f"{auth_url}?{urllib.parse.urlencode(params)}")
-
-
-from django.shortcuts import redirect
 
 
 def spotify_callback(request):
@@ -88,13 +87,6 @@ def refresh_access_token(session):
     return None
 
 
-def index(request):
-    return render(request, 'spotify_auth/index.html')
-
-
-from django.http import JsonResponse
-
-
 def profile(request):
     access_token = request.session.get('access_token')
 
@@ -123,3 +115,39 @@ def profile(request):
     profile_data = profile_response.json()
     return render(request, 'spotify_auth/profile.html', {"profile": profile_data})
 
+
+def get_top_tracks(request):
+    access_token = request.session.get('access_token')
+
+    if not access_token:
+        return redirect('spotify_login')
+
+    top_tracks_url = "https://api.spotify.com/v1/me/top/tracks"
+    headers = {
+        "Authorization": f"Bearer {access_token}"
+    }
+
+    # Parameters for the API request
+    params = {
+        "limit": 20,  # Number of tracks to retrieve
+        "time_range": "medium_term"  # Options: long_term, medium_term, short_term
+    }
+
+    # Fetch top tracks data
+    response = requests.get(top_tracks_url, headers=headers, params=params)
+
+    if response.status_code == 403:
+        # Attempt to refresh the access token
+        access_token = refresh_access_token(request.session)
+        if access_token:
+            headers["Authorization"] = f"Bearer {access_token}"
+            response = requests.get(top_tracks_url, headers=headers, params=params)
+
+    if response.status_code != 200:
+        return JsonResponse(
+            {"error": "Failed to retrieve top tracks.", "details": response.text},
+            status=response.status_code
+        )
+
+    tracks_data = response.json()
+    return render(request, 'spotify_auth/top_tracks.html', {"tracks": tracks_data['items']})

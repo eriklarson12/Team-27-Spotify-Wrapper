@@ -1,0 +1,59 @@
+<h1>Your Top Tracks</h1>
+
+<div class="tracks-container">
+    {% for track in tracks %}
+    <div class="track-item">
+        <h3>{{ forloop.counter }}. {{ track.name }}</h3>
+        <p>
+            Artists: 
+            {% for artist in track.artists %}
+                {{ artist.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p>Album: {{ track.album.name }}</p>
+        {% if track.album.images %}
+        <img src="{{ track.album.images.0.url }}" alt="{{ track.album.name }}" style="width: 100px; height: 100px;">
+        {% endif %}
+        <p>
+            <a href="{{ track.external_urls.spotify }}" target="_blank">
+                Listen on Spotify
+            </a>
+        </p>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+    .tracks-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        padding: 20px;
+    }
+    
+    .track-item {
+        border: 1px solid #ddd;
+        padding: 15px;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+    }
+    
+    .track-item h3 {
+        margin-top: 0;
+        color: #333;
+    }
+    
+    .track-item img {
+        border-radius: 4px;
+        margin: 10px 0;
+    }
+    
+    .track-item a {
+        color: #1DB954;
+        text-decoration: none;
+    }
+    
+    .track-item a:hover {
+        text-decoration: underline;
+    }
+</style>
