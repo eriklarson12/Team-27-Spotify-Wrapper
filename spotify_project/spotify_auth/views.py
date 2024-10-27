@@ -151,3 +151,39 @@ def get_top_tracks(request):
 
     tracks_data = response.json()
     return render(request, 'spotify_auth/top_tracks.html', {"tracks": tracks_data['items']})
+
+def get_top_artists(request):
+    access_token = request.session.get('access_token')
+
+    if not access_token:
+        return redirect('spotify_login')
+
+    top_artists_url = "https://api.spotify.com/v1/me/top/artists"
+    headers = {
+        "Authorization": f"Bearer {access_token}"
+    }
+
+    # Parameters for the API request
+    params = {
+        "limit": 20,  # Number of artists to retrieve
+        "time_range": "medium_term"  # Options: long_term, medium_term, short_term
+    }
+
+    # Fetch top artists data
+    response = requests.get(top_artists_url, headers=headers, params=params)
+
+    if response.status_code == 403:
+        # Attempt to refresh the access token
+        access_token = refresh_access_token(request.session)
+        if access_token:
+            headers["Authorization"] = f"Bearer {access_token}"
+            response = requests.get(top_artists_url, headers=headers, params=params)
+
+    if response.status_code != 200:
+        return JsonResponse(
+            {"error": "Failed to retrieve top artists.", "details": response.text},
+            status=response.status_code
+        )
+
+    artists_data = response.json()
+    return render(request, 'spotify_auth/top_artists.html', {"artists": artists_data['items']})

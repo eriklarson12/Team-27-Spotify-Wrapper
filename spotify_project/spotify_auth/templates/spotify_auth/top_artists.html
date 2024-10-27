@@ -1,0 +1,58 @@
+<h1>Your Top Artists</h1>
+
+<div class="artists-container">
+    {% for artist in artists %}
+    <div class="artist-item">
+        <h3>{{ forloop.counter }}. {{ artist.name }}</h3>
+        <p>
+            Genres: 
+            {% for genre in artist.genres %}
+                {{ genre }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        {% if artist.images %}
+        <img src="{{ artist.images.0.url }}" alt="{{ artist.name }}" style="width: 100px; height: 100px;">
+        {% endif %}
+        <p>
+            <a href="{{ artist.external_urls.spotify }}" target="_blank">
+                Listen on Spotify
+            </a>
+        </p>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+    .artists-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        padding: 20px;
+    }
+    
+    .artist-item {
+        border: 1px solid #ddd;
+        padding: 15px;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+    }
+    
+    .artist-item h3 {
+        margin-top: 0;
+        color: #333;
+    }
+    
+    .artist-item img {
+        border-radius: 4px;
+        margin: 10px 0;
+    }
+    
+    .artist-item a {
+        color: #1DB954;
+        text-decoration: none;
+    }
+    
+    .artist-item a:hover {
+        text-decoration: underline;
+    }
+</style>
