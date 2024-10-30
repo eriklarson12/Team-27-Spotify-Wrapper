@@ -1,3 +1,5 @@
+from collections import Counter
+
 import requests
 from django.shortcuts import redirect
 from django.conf import settings
@@ -187,3 +189,53 @@ def get_top_artists(request):
 
     artists_data = response.json()
     return render(request, 'spotify_auth/top_artists.html', {"artists": artists_data['items']})
+
+def get_top_genre(request):
+    access_token = request.session.get('access_token')
+
+    if not access_token:
+        return redirect('spotify_login')
+
+    top_artists_url = "https://api.spotify.com/v1/me/top/artists"
+    headers = {
+        "Authorization": f"Bearer {access_token}"
+    }
+
+    # Parameters for the API request
+    params = {
+        "limit": 20,  # Number of artists to retrieve
+        "time_range": "medium_term"  # Options: long_term, medium_term, short_term
+    }
+
+    # Fetch top artists data
+    response = requests.get(top_artists_url, headers=headers, params=params)
+
+    if response.status_code == 403:
+        # Attempt to refresh the access token
+        access_token = refresh_access_token(request.session)
+        if access_token:
+            headers["Authorization"] = f"Bearer {access_token}"
+            response = requests.get(top_artists_url, headers=headers, params=params)
+
+    if response.status_code != 200:
+        return JsonResponse(
+            {"error": "Failed to retrieve top artists.", "details": response.text},
+            status=response.status_code
+        )
+
+    top_artists = response.json().get('items', [])
+    genres = []
+
+    for artist in top_artists:
+        genres.extend(artist.get('genres', []))
+
+    if not genres:
+        return None
+
+    # Determine the most common genre
+    genre_counts = Counter(genres)
+    favorite_genre = genre_counts.most_common(1)[0][0]
+    number = genre_counts.most_common(1)[0][1]
+    total_genres = len(genre_counts)
+
+    return render(request, 'spotify_auth/top_genre.html', {"favorite_genre": favorite_genre, "number": number, "total_genres": total_genres})

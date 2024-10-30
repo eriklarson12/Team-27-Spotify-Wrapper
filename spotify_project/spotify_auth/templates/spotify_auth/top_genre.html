@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Top Genre</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #121212;
+            color: white;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .container {
+            background-color: #282828;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #1DB954;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+        
+        .genre-name {
+            font-size: 36px;
+            margin: 20px 0;
+            text-transform: capitalize;
+        }
+        
+        .stats {
+            color: #b3b3b3;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Your Top Music Genre</h1>
+        <div class="genre-name">{{ favorite_genre }}</div>
+        <div class="stats">
+            Found in {{ number }} of your top artists<br>
+            Out of {{ total_genres }} total genre mentions
+        </div>
+    </div>
+</body>
+</html>
