@@ -1,4 +1,5 @@
 from collections import Counter
+
 import requests
 from django.conf import settings
 from django.http import JsonResponse
@@ -316,3 +317,36 @@ def get_personality_insights(request):
         return JsonResponse({
             'error': f'An error occurred: {str(e)}'
         }, status=500)
+
+def get_top_artists2(access_token, time_range):
+    url = 'https://api.spotify.com/v1/me/top/artists'
+    headers = {
+        'Authorization': f'Bearer {access_token}'
+    }
+    params = {
+        'limit': 50,
+        'time_range': time_range  # Can be 'medium_term' or 'long_term'
+    }
+    response = requests.get(url, headers=headers, params=params)
+    if response.status_code == 200:
+        data = response.json()
+        return [artist['name'] for artist in data['items']]
+    return []
+
+def new_artists_discovered(request):
+    access_token = request.session.get('access_token')
+    if not access_token:
+        return redirect('spotify_login')
+
+    # Fetch medium-term and long-term top artists
+    medium_term_artists = get_top_artists2(access_token, 'medium_term')
+    long_term_artists = set(get_top_artists2(access_token, 'long_term'))
+
+    # Identify new artists as those in medium-term but not in long-term data
+    new_artists = [artist for artist in medium_term_artists if artist not in long_term_artists]
+    new_artists_count = len(new_artists)
+
+    context = {
+        'new_artists_count': new_artists_count
+    }
+    return render(request, 'spotify_auth/new_artists_slide.html', context)

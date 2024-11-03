@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Artists Discovered</title>
+    <style>
+        /* Spotify-inspired styling */
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #121212;
+            color: #FFFFFF;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .slide-container {
+            text-align: center;
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .slide-title {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .new-artists-count {
+            font-size: 3.5em;
+            font-weight: bold;
+            color: #1DB954; /* Spotify green */
+            margin: 10px 0;
+        }
+
+        .description {
+            font-size: 1.1em;
+            color: #b3b3b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="slide-title">New Artists Discovered</div>
+        <div class="new-artists-count">{{ new_artists_count }}</div>
+        <div class="description">artists you've started listening to recently.</div>
+    </div>
+</body>
+</html>
