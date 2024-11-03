@@ -8,5 +8,6 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
     path('top-tracks/', views.get_top_tracks, name='get_top_tracks'),
     path('top-artists/', views.get_top_artists, name='get_top_artists'),
-    path('top-genre/', views.get_top_genre, name='get_top_genre')
+    path('top-genre/', views.get_top_genre, name='get_top_genre'),
+    path('personality_insights/', views.get_personality_insights, name='get_personality_insights')
 ]

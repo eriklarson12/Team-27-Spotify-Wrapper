@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Music Personality</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #121212;
+            color: white;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .container {
+            background-color: #282828;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #1DB954;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #181818;
+            border-radius: 6px;
+        }
+        
+        .section-title {
+            color: #1DB954;
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        
+        .artists-list, .genres-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            text-align: left;
+        }
+        
+        .artists-list li, .genres-list li {
+            margin-bottom: 8px;
+            color: #b3b3b3;
+            display: flex;
+            align-items: center;
+        }
+        
+        .number {
+            color: #1DB954;
+            margin-right: 10px;
+            font-size: 14px;
+            min-width: 20px;
+        }
+        
+        .insights {
+            text-align: left;
+            color: #b3b3b3;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+        
+        .divider {
+            height: 1px;
+            background-color: #404040;
+            margin: 20px 0;
+        }
+        
+        .genre-name {
+            text-transform: capitalize;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Your Music Personality</h1>
+        
+        <div class="section">
+            <div class="section-title">Top Artists</div>
+            <ul class="artists-list">
+                {% for artist in top_artists %}
+                    <li>
+                        <span class="number">{{ forloop.counter }}.</span>
+                        {{ artist }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Top Genres</div>
+            <ul class="genres-list">
+                {% for genre in top_genres %}
+                    <li>
+                        <span class="number">{{ forloop.counter }}.</span>
+                        <span class="genre-name">{{ genre }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Personality Insights</div>
+            <div class="insights">
+                {{ personality_insights|linebreaks }}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

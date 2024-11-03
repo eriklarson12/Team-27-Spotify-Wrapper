@@ -1,7 +1,5 @@
 from collections import Counter
-
 import requests
-from django.shortcuts import redirect
 from django.conf import settings
 from django.http import JsonResponse
 import base64
@@ -239,3 +237,82 @@ def get_top_genre(request):
     total_genres = len(genre_counts)
 
     return render(request, 'spotify_auth/top_genre.html', {"favorite_genre": favorite_genre, "number": number, "total_genres": total_genres})
+
+def get_personality_insights(request):
+    from .gemini_client import GeminiClient
+
+    access_token = request.session.get('access_token')
+    if not access_token:
+        return redirect('spotify_login')
+
+    # Initialize Gemini client
+    gemini_client = GeminiClient()
+
+    try:
+        # Fetch top artists data
+        top_artists_url = "https://api.spotify.com/v1/me/top/artists"
+        headers = {
+            "Authorization": f"Bearer {access_token}"
+        }
+
+        params = {
+            "limit": 20,  # Consistent with other views
+            "time_range": "medium_term"
+        }
+
+        response = requests.get(top_artists_url, headers=headers, params=params)
+
+        if response.status_code == 403:
+            access_token = refresh_access_token(request.session)
+            if access_token:
+                headers["Authorization"] = f"Bearer {access_token}"
+                response = requests.get(top_artists_url, headers=headers, params=params)
+
+        if response.status_code != 200:
+            return JsonResponse({
+                "error": "Failed to retrieve top artists.",
+                "details": response.text
+            }, status=response.status_code)
+
+        artists_data = response.json().get('items', [])
+
+        # Extract top artists names (take top 5 for personality insights)
+        top_artists = [artist['name'] for artist in artists_data[:5]]
+
+        # Collect all genres from all artists
+        genres = []
+        for artist in artists_data:
+            genres.extend(artist.get('genres', []))
+
+        # Get top 5 genres using Counter (consistent with get_top_genre)
+        genre_counts = Counter(genres)
+        top_genres = [genre for genre, _ in genre_counts.most_common(5)]
+
+        # Generate personality insights
+        personality_insights = gemini_client.generate_personality_insights(
+            top_genres=top_genres,
+            top_artists=top_artists
+        )
+
+        # Return JSON if it's an AJAX request
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'personality_insights': personality_insights,
+                'top_artists': top_artists,
+                'top_genres': top_genres
+            })
+        # print("Top Artists:", top_artists)
+        # print("Top Genres:", top_genres)
+        # print("Personality Insights:", personality_insights)
+
+        # Otherwise render the full template
+        return render(request, 'spotify_auth/personality_insights.html', {
+            'personality_insights': personality_insights,
+            'top_artists': top_artists,
+            'top_genres': top_genres
+        })
+
+    except Exception as e:
+        return JsonResponse({
+            'error': f'An error occurred: {str(e)}'
+        }, status=500)
