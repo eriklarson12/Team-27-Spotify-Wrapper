@@ -350,3 +350,54 @@ def new_artists_discovered(request):
         'new_artists_count': new_artists_count
     }
     return render(request, 'spotify_auth/new_artists_slide.html', context)
+
+def get_listening_time(request):
+    access_token = request.session.get('access_token')
+
+    if not access_token:
+        return redirect('spotify_login')
+
+    top_tracks_url = "https://api.spotify.com/v1/me/top/tracks"
+    headers = {
+        "Authorization": f"Bearer {access_token}"
+    }
+
+    # Parameters for the API request - we just need the top track
+    params = {
+        "limit": 1,  # Only get the top track
+        "time_range": "medium_term"
+    }
+
+    # Fetch top track data
+    response = requests.get(top_tracks_url, headers=headers, params=params)
+
+    if response.status_code == 403:
+        # Attempt to refresh the access token
+        access_token = refresh_access_token(request.session)
+        if access_token:
+            headers["Authorization"] = f"Bearer {access_token}"
+            response = requests.get(top_tracks_url, headers=headers, params=params)
+
+    if response.status_code != 200:
+        return JsonResponse(
+            {"error": "Failed to retrieve top track.", "details": response.text},
+            status=response.status_code
+        )
+
+    track_data = response.json()['items'][0]  # Get the first (top) track
+
+    # Get track details
+    track_name = track_data['name']
+    artist_name = track_data['artists'][0]['name']
+    duration_ms = track_data['duration_ms']
+
+    # Convert to minutes and seconds for display
+    minutes = duration_ms // (1000 * 60)
+    seconds = (duration_ms % (1000 * 60)) // 1000
+
+    return render(request, 'spotify_auth/listening_time.html', {
+        "track_name": track_name,
+        "artist_name": artist_name,
+        "minutes": minutes,
+        "seconds": seconds
+    })
