@@ -1,48 +1,163 @@
-<h1>Your Spotify Profile</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Spotify Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #191414;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
 
-<div class="profile-info">
-    <p><strong>Name:</strong> {{ profile.display_name }}</p>
-    <p><strong>Email:</strong> {{ profile.email }}</p>
-    <p><strong>Country:</strong> {{ profile.country }}</p>
-    <p><strong>Spotify URL:</strong> <a href="{{ profile.external_urls.spotify }}">{{ profile.external_urls.spotify }}</a></p>
-</div>
+        body.light-mode {
+            background-color: #ffffff;
+            color: #ffffff;
+        }
 
-<div class="actions">
-    <a href="{% url 'get_top_tracks' %}" class="spotify-button">View Your Top Tracks</a>
-</div>
-<div class="actions">
-    <a href="{% url 'get_top_artists' %}" class="spotify-button">View Your Top Artists</a>
-</div>
-<div class="actions">
-    <a href="{% url 'get_top_genre' %}" class="spotify-button">View Your Top Genre</a>
-</div>
-<div class="actions">
-    <a href="{% url 'get_personality_insights' %}" class="spotify-button">View Your Personality Insights</a>
-</div>
-<div class="actions">
-    <a href="{% url 'new_artists_discovered' %}" class="spotify-button">New Artists Discovered</a>
-</div>
-<div class="actions">
-    <a href="{% url 'get_listening_time' %}" class="spotify-button">Minutes listened to top artist</a>
-</div>
+        .top-bar {
+            display: flex;
+            justify-content: flex-end;
+            padding: 10px 20px;
+            background-color: #1DB954;
+        }
 
-<style>
-    .profile-info {
-        margin: 20px 0;
-    }
-    
-    .spotify-button {
-        display: inline-block;
-        background-color: #1DB954;
-        color: white;
-        padding: 12px 24px;
-        border-radius: 24px;
-        text-decoration: none;
-        font-weight: bold;
-        margin-top: 20px;
-    }
-    
-    .spotify-button:hover {
-        background-color: #1ed760;
-    }
-</style>
+        .theme-toggle-button {
+            background-color: white;
+            color: #1DB954;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .theme-toggle-button:hover {
+            background-color: #f0f0f0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1DB954;
+            font-size: 36px;
+            margin-bottom: 30px;
+        }
+
+        .profile-info {
+            background-color: #282828;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .profile-info p {
+            margin: 10px 0;
+        }
+
+        .profile-info a {
+            color: #1DB954;
+            text-decoration: none;
+        }
+
+        .actions {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .spotify-button {
+            display: inline-block;
+            background-color: #1DB954;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 24px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        .spotify-button:hover {
+            background-color: #1ed760;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <button id="theme-toggle" class="theme-toggle-button">Toggle Dark Mode</button>
+    </div>
+
+    <h1>Your Spotify Profile</h1>
+
+    <div class="profile-info">
+        <p><strong>Name:</strong> {{ profile.display_name }}</p>
+        <p><strong>Email:</strong> {{ profile.email }}</p>
+        <p><strong>Country:</strong> {{ profile.country }}</p>
+        <p><strong>Spotify URL:</strong> 
+           <a href="{{ profile.external_urls.spotify }}">{{ profile.external_urls.spotify }}</a>
+       </p>
+    </div>
+
+    <div class="actions">
+        <a href="{% url 'get_top_tracks' %}" class="spotify-button">View Your Top Tracks</a>
+    </div>
+    <div class="actions">
+        <a href="{% url 'get_top_artists' %}" class="spotify-button">View Your Top Artists</a>
+    </div>
+    <div class="actions">
+        <a href="{% url 'get_top_genre' %}" class="spotify-button">View Your Top Genre</a>
+    </div>
+    <div class="actions">
+        <a href="{% url 'get_personality_insights' %}" class="spotify-button">View Your Personality Insights</a>
+    </div>
+    <div class="actions">
+        <a href="{% url 'new_artists_discovered' %}" class="spotify-button">New Artists Discovered</a>
+    </div>
+    <div class="actions">
+        <a href="{% url 'get_listening_time' %}" class="spotify-button">Minutes listened to top artist</a>
+    </div>
+
+    <!-- JavaScript for theme toggle -->
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+        
+        // Check local storage for saved theme preference
+        const savedTheme = localStorage.getItem('theme');
+        
+        if (savedTheme) {
+            document.body.classList.add(savedTheme); // Apply saved theme
+            updateButtonText(savedTheme);
+        }
+
+        themeToggle.addEventListener('click', function() {
+            document.body.classList.toggle('light-mode'); // Toggle between light and dark mode
+            
+            let currentTheme = 'dark-mode'; // Default is dark mode
+            if (document.body.classList.contains('light-mode')) {
+                currentTheme = 'light-mode';
+            }
+            
+            // Save the current theme in local storage
+            localStorage.setItem('theme', currentTheme);
+
+            // Update button text based on current theme
+            updateButtonText(currentTheme);
+        });
+
+        function updateButtonText(theme) {
+          if (theme === 'light-mode') {
+              themeToggle.textContent = 'Toggle Dark Mode';
+          } else {
+              themeToggle.textContent = 'Toggle Light Mode';
+          }
+      }
+    </script>
+
+</body>
+</html>

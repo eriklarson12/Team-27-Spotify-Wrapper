@@ -1,59 +1,191 @@
-<h1>Your Top Tracks</h1>
+<div class="top-bar">
+    <button id="theme-toggle" class="theme-toggle-button">Toggle Dark Mode</button>
+</div>
+
+<h1 class="page-title">Your Top Tracks</h1>
 
 <div class="tracks-container">
     {% for track in tracks %}
-    <div class="track-item">
+    <div class="track-item fade-in">
+        <!-- Track title -->
         <h3>{{ forloop.counter }}. {{ track.name }}</h3>
-        <p>
-            Artists: 
-            {% for artist in track.artists %}
-                {{ artist.name }}{% if not forloop.last %}, {% endif %}
-            {% endfor %}
-        </p>
-        <p>Album: {{ track.album.name }}</p>
+        
+        <!-- Album cover -->
         {% if track.album.images %}
-        <img src="{{ track.album.images.0.url }}" alt="{{ track.album.name }}" style="width: 100px; height: 100px;">
+        <img src="{{ track.album.images.0.url }}" alt="{{ track.album.name }}" class="album-cover">
         {% endif %}
-        <p>
-            <a href="{{ track.external_urls.spotify }}" target="_blank">
-                Listen on Spotify
-            </a>
-        </p>
+        
+        <!-- Artists and Album -->
+        <div class="track-details">
+            <p><strong>Artists:</strong> 
+                {% for artist in track.artists %}
+                    {{ artist.name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+            <p><strong>Album:</strong> {{ track.album.name }}</p>
+            <p>
+                <a href="{{ track.external_urls.spotify }}" target="_blank" class="spotify-link">
+                    Listen on Spotify
+                </a>
+            </p>
+        </div>
     </div>
     {% endfor %}
 </div>
 
 <style>
-    .tracks-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 20px;
-        padding: 20px;
+    /* General body styling */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #191414;
+        color: #ffffff;
+        margin: 0;
+        padding: 0;
+        transition: background-color 0.3s, color 0.3s;
     }
-    
-    .track-item {
-        border: 1px solid #ddd;
-        padding: 15px;
-        border-radius: 8px;
-        background-color: #f9f9f9;
+
+    body.light-mode {
+        background-color: #ffffff;
+        color: #191414;
     }
-    
-    .track-item h3 {
-        margin-top: 0;
-        color: #333;
+
+    .top-bar {
+        display: flex;
+        justify-content: flex-end;
+        padding: 10px 20px;
+        background-color: #1DB954;
     }
-    
-    .track-item img {
-        border-radius: 4px;
-        margin: 10px 0;
-    }
-    
-    .track-item a {
+
+    .theme-toggle-button {
+        background-color: white;
         color: #1DB954;
-        text-decoration: none;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .theme-toggle-button:hover {
+        background-color: #f0f0f0;
+    }
+
+    /* Title styling */
+    .page-title {
+        text-align: center;
+        color: #1DB954; /* Make title green */
+        font-size: 36px;
+        margin-top: 40px; /* Add space from the top */
+        margin-bottom: 30px; /* Space below title */
+    }
+
+    /* Container grid layout */
+    .tracks-container {
+        display: grid; 
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+        gap: 20px; /* Add spacing between cards */
+        padding: 20px; 
     }
     
-    .track-item a:hover {
-        text-decoration: underline;
+    /* Track item styling */
+    .track-item {
+        background-color: #1DB954; /* Green background for track cards */
+        border-radius: 10px; 
+        padding: 20px; 
+        text-align: center; 
     }
+    
+    .track-item h3, .track-item p, .track-item a {
+        color: white !important; /* Ensure text always stays white */
+    }
+    
+    .album-cover {
+        width: 100px; 
+        height: auto; 
+        border-radius: 8px; 
+        margin-bottom: 10px; /* Space between image and details */
+    }
+    
+    .track-details p {
+        margin-bottom: 10px; /* Space between paragraphs */
+    }
+    
+    .spotify-link {
+       color:white ;
+       text-decoration:none ;
+       font-weight:bold ;
+       transition :color 0.3s ease-in-out ;
+   }
+
+   .spotify-link:hover {
+       color:#1ed760 ; /* Lighter green on hover */
+   }
+
+   /* Ensure labels stand out */
+   .track-details strong {
+       font-weight:bold ;
+       color:white !important; /* Force labels to stay white regardless of mode */
+   }
+
+   /* Fade-in animation for track items */
+   @keyframes fadeIn {
+       from { opacity: 0; transform: translateY(20px); }
+       to { opacity: 1; transform: translateY(0); }
+   }
+
+   .fade-in {
+       opacity: 0; /* Start invisible */
+       animation-name: fadeIn;
+       animation-duration: 0.5s;
+       animation-fill-mode: forwards; /* Keep final state after animation ends */
+   }
+
+   /* Sequential animations using nth-child() */
+   .fade-in:nth-child(1) { animation-delay: 0.2s; }
+   .fade-in:nth-child(2) { animation-delay: 0.4s; }
+   .fade-in:nth-child(3) { animation-delay: 0.6s; }
+   .fade-in:nth-child(4) { animation-delay: 0.8s; }
+   .fade-in:nth-child(5) { animation-delay: 1s; }
+   .fade-in:nth-child(6) { animation-delay: 1.2s; }
+   .fade-in:nth-child(7) { animation-delay: 1.4s; }
+   .fade-in:nth-child(8) { animation-delay: 1.6s; }
+   .fade-in:nth-child(9) { animation-delay: 1.8s; }
+   .fade-in:nth-child(10) { animation-delay: 2s; }
+
 </style>
+
+<script>
+    // JavaScript function to toggle light/dark mode
+    const themeToggle = document.getElementById('theme-toggle');
+    
+    // Check local storage for saved theme preference
+    const savedTheme = localStorage.getItem('theme');
+    
+    if (savedTheme) {
+        document.body.classList.add(savedTheme); // Apply saved theme
+        updateButtonText(savedTheme);
+    }
+
+    themeToggle.addEventListener('click', function() {
+        document.body.classList.toggle('light-mode'); // Toggle between light and dark mode
+        
+        let currentTheme = 'dark-mode'; // Default is dark mode
+        if (document.body.classList.contains('light-mode')) {
+            currentTheme = 'light-mode';
+        }
+        
+        // Save the current theme in local storage
+        localStorage.setItem('theme', currentTheme);
+
+        // Update button text based on current theme
+        updateButtonText(currentTheme);
+    });
+
+    function updateButtonText(theme) {
+        if (theme === 'light-mode') {
+            themeToggle.textContent = 'Toggle Dark Mode';
+        } else {
+            themeToggle.textContent = 'Toggle Light Mode';
+        }
+    }
+</script>
