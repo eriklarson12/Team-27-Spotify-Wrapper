@@ -117,127 +117,58 @@ def profile(request):
     return render(request, 'spotify_auth/profile.html', {"profile": profile_data})
 
 
+# Function to get top tracks
 def get_top_tracks(request):
     access_token = request.session.get('access_token')
-
     if not access_token:
-        return redirect('spotify_login')
+        return []
 
-    top_tracks_url = "https://api.spotify.com/v1/me/top/tracks"
-    headers = {
-        "Authorization": f"Bearer {access_token}"
-    }
-
-    # Parameters for the API request
-    params = {
-        "limit": 20,  # Number of tracks to retrieve
-        "time_range": "medium_term"  # Options: long_term, medium_term, short_term
-    }
-
-    # Fetch top tracks data
-    response = requests.get(top_tracks_url, headers=headers, params=params)
-
-    if response.status_code == 403:
-        # Attempt to refresh the access token
-        access_token = refresh_access_token(request.session)
-        if access_token:
-            headers["Authorization"] = f"Bearer {access_token}"
-            response = requests.get(top_tracks_url, headers=headers, params=params)
-
+    url = "https://api.spotify.com/v1/me/top/tracks"
+    headers = get_spotify_headers(access_token)
+    params = {"limit": 5, "time_range": "medium_term"}
+    response = requests.get(url, headers=headers, params=params)
     if response.status_code != 200:
-        return JsonResponse(
-            {"error": "Failed to retrieve top tracks.", "details": response.text},
-            status=response.status_code
-        )
+        return []
 
-    tracks_data = response.json()
-    return render(request, 'spotify_auth/top_tracks.html', {"tracks": tracks_data['items']})
+    tracks = response.json().get("items", [])
+    return [track["name"] for track in tracks]
 
+
+# Function to get top artists
 def get_top_artists(request):
     access_token = request.session.get('access_token')
-
     if not access_token:
-        return redirect('spotify_login')
+        return []
 
-    top_artists_url = "https://api.spotify.com/v1/me/top/artists"
-    headers = {
-        "Authorization": f"Bearer {access_token}"
-    }
-
-    # Parameters for the API request
-    params = {
-        "limit": 20,  # Number of artists to retrieve
-        "time_range": "medium_term"  # Options: long_term, medium_term, short_term
-    }
-
-    # Fetch top artists data
-    response = requests.get(top_artists_url, headers=headers, params=params)
-
-    if response.status_code == 403:
-        # Attempt to refresh the access token
-        access_token = refresh_access_token(request.session)
-        if access_token:
-            headers["Authorization"] = f"Bearer {access_token}"
-            response = requests.get(top_artists_url, headers=headers, params=params)
-
+    url = "https://api.spotify.com/v1/me/top/artists"
+    headers = get_spotify_headers(access_token)
+    params = {"limit": 5, "time_range": "medium_term"}
+    response = requests.get(url, headers=headers, params=params)
     if response.status_code != 200:
-        return JsonResponse(
-            {"error": "Failed to retrieve top artists.", "details": response.text},
-            status=response.status_code
-        )
+        return []
 
-    artists_data = response.json()
-    return render(request, 'spotify_auth/top_artists.html', {"artists": artists_data['items']})
+    artists = response.json().get("items", [])
+    return [artist["name"] for artist in artists]
 
+
+# Function to get top genre
 def get_top_genre(request):
     access_token = request.session.get('access_token')
-
     if not access_token:
-        return redirect('spotify_login')
+        return "Unknown"
 
-    top_artists_url = "https://api.spotify.com/v1/me/top/artists"
-    headers = {
-        "Authorization": f"Bearer {access_token}"
-    }
-
-    # Parameters for the API request
-    params = {
-        "limit": 20,  # Number of artists to retrieve
-        "time_range": "medium_term"  # Options: long_term, medium_term, short_term
-    }
-
-    # Fetch top artists data
-    response = requests.get(top_artists_url, headers=headers, params=params)
-
-    if response.status_code == 403:
-        # Attempt to refresh the access token
-        access_token = refresh_access_token(request.session)
-        if access_token:
-            headers["Authorization"] = f"Bearer {access_token}"
-            response = requests.get(top_artists_url, headers=headers, params=params)
-
+    url = "https://api.spotify.com/v1/me/top/artists"
+    headers = get_spotify_headers(access_token)
+    params = {"limit": 10, "time_range": "medium_term"}
+    response = requests.get(url, headers=headers, params=params)
     if response.status_code != 200:
-        return JsonResponse(
-            {"error": "Failed to retrieve top artists.", "details": response.text},
-            status=response.status_code
-        )
+        return "Unknown"
 
-    top_artists = response.json().get('items', [])
-    genres = []
+    artists = response.json().get("items", [])
+    genres = [genre for artist in artists for genre in artist.get("genres", [])]
+    top_genre = Counter(genres).most_common(1)
+    return top_genre[0][0] if top_genre else "Unknown"
 
-    for artist in top_artists:
-        genres.extend(artist.get('genres', []))
-
-    if not genres:
-        return None
-
-    # Determine the most common genre
-    genre_counts = Counter(genres)
-    favorite_genre = genre_counts.most_common(1)[0][0]
-    number = genre_counts.most_common(1)[0][1]
-    total_genres = len(genre_counts)
-
-    return render(request, 'spotify_auth/top_genre.html', {"favorite_genre": favorite_genre, "number": number, "total_genres": total_genres})
 
 def get_personality_insights(request):
     from .gemini_client import GeminiClient
@@ -333,23 +264,35 @@ def get_top_artists2(access_token, time_range):
         return [artist['name'] for artist in data['items']]
     return []
 
+
+
+
+# Function to get new artists discovered
 def new_artists_discovered(request):
     access_token = request.session.get('access_token')
     if not access_token:
-        return redirect('spotify_login')
+        return 0
 
-    # Fetch medium-term and long-term top artists
-    medium_term_artists = get_top_artists2(access_token, 'medium_term')
-    long_term_artists = set(get_top_artists2(access_token, 'long_term'))
+    url = "https://api.spotify.com/v1/me/top/artists"
+    headers = get_spotify_headers(access_token)
 
-    # Identify new artists as those in medium-term but not in long-term data
-    new_artists = [artist for artist in medium_term_artists if artist not in long_term_artists]
-    new_artists_count = len(new_artists)
+    # Get short-term and long-term top artists
+    short_term_response = requests.get(url, headers=headers, params={"time_range": "short_term"})
+    long_term_response = requests.get(url, headers=headers, params={"time_range": "long_term"})
 
-    context = {
-        'new_artists_count': new_artists_count
-    }
-    return render(request, 'spotify_auth/new_artists_slide.html', context)
+    if short_term_response.status_code != 200 or long_term_response.status_code != 200:
+        return 0
+
+    short_term_artists = {artist["name"] for artist in short_term_response.json().get("items", [])}
+    long_term_artists = {artist["name"] for artist in long_term_response.json().get("items", [])}
+
+    # New artists are those in short-term data but not in long-term data
+    new_artists = short_term_artists - long_term_artists
+    return len(new_artists)
+
+
+
+
 
 def get_listening_time(request):
     access_token = request.session.get('access_token')
@@ -401,3 +344,24 @@ def get_listening_time(request):
         "minutes": minutes,
         "seconds": seconds
     })
+
+
+def spotify_wrap(request):
+    top_tracks = get_top_tracks(request)
+    top_artists = get_top_artists(request)
+    top_genre = get_top_genre(request)
+    new_artists_count = new_artists_discovered(request)
+    #personal_insights = get_personal_insights(request)
+
+    context = {
+        "top_tracks": top_tracks,
+        "top_artists": top_artists,
+        "top_genre": top_genre,
+        "new_artists_count": new_artists_count,
+       # "personal_insights": personal_insights,
+    }
+
+    return render(request, 'spotify_auth/wrap.html', context)
+
+def get_spotify_headers(access_token):
+    return {"Authorization": f"Bearer {access_token}"}

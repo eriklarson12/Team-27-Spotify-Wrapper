@@ -12,4 +12,5 @@ urlpatterns = [
     path('personality_insights/', views.get_personality_insights, name='get_personality_insights'),
     path('new-artists/', views.new_artists_discovered, name='new_artists_discovered'),
     path('listening-time/', views.get_listening_time, name='get_listening_time'),
+    path('spotify_wrap/', views.spotify_wrap, name='spotify_wrap'),
 ]

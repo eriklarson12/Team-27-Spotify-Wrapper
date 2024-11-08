@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Spotify Wrapped</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #191414;
+            color: #ffffff;
+            text-align: center;
+        }
+        .slide {
+            display: none;
+        }
+        .active {
+            display: block;
+        }
+        .button {
+            padding: 10px 20px;
+            background-color: #1DB954;
+            color: #ffffff;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- Slides -->
+    <div class="slide active">
+        <h1>Welcome to Your Spotify Wrapped</h1>
+        <p>Let’s see your music journey!</p>
+    </div>
+
+    <div class="slide">
+        <h2>Your Top Tracks Are...</h2>
+        <ul>
+            {% for track in top_tracks %}
+                <li>{{ track }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="slide">
+        <h2>Your Top Genre</h2>
+        <p>{{ top_genre }}</p>
+    </div>
+
+    <div class="slide">
+        <h2>Your Top Artists Are...</h2>
+        <ul>
+            {% for artist in top_artists %}
+                <li>{{ artist }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="slide">
+        <h2>New Artists Discovered</h2>
+        <p>You discovered {{ new_artists_count }} new artists this year!</p>
+    </div>
+
+    <div class="slide">
+        <h2>Thank You for Listening!</h2>
+        <p>See you next year with more music insights!</p>
+    </div>
+
+    <!-- Navigation Button -->
+    <button id="next-button" class="button">Next</button>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        document.getElementById('next-button').addEventListener('click', () => {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        });
+    </script>
+
+</body>
+</html>
