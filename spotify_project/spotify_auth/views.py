@@ -238,11 +238,7 @@ def get_personality_insights(request):
         # print("Personality Insights:", personality_insights)
 
         # Otherwise render the full template
-        return render(request, 'spotify_auth/personality_insights.html', {
-            'personality_insights': personality_insights,
-            'top_artists': top_artists,
-            'top_genres': top_genres
-        })
+        return personality_insights
 
     except Exception as e:
         return JsonResponse({
@@ -351,14 +347,14 @@ def spotify_wrap(request):
     top_artists = get_top_artists(request)
     top_genre = get_top_genre(request)
     new_artists_count = new_artists_discovered(request)
-    #personal_insights = get_personal_insights(request)
+    personality_insights = get_personality_insights(request)
 
     context = {
         "top_tracks": top_tracks,
         "top_artists": top_artists,
         "top_genre": top_genre,
         "new_artists_count": new_artists_count,
-       # "personal_insights": personal_insights,
+        "personality_insights": personality_insights,
     }
 
     return render(request, 'spotify_auth/wrap.html', context)
