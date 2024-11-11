@@ -24,6 +24,7 @@
             </p>
             <p><strong>Album:</strong> {{ track.album.name }}</p>
             <p>
+                <button class="play-button" onclick="togglePlay('{{ track.id }}')">Play</button>
                 <a href="{{ track.external_urls.spotify }}" target="_blank" class="spotify-link">
                     Listen on Spotify
                 </a>
@@ -126,6 +127,28 @@
        font-weight:bold ;
        color:white !important; /* Force labels to stay white regardless of mode */
    }
+   
+   .play-button {
+            background-color: #1DB954;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .play-button:hover {
+            background-color: #1ed760;
+        }
+
+        .play-button.playing {
+            background-color: #ff4444;
+        }
+
+        #audio-player {
+            display: none;
+        }
 
    /* Fade-in animation for track items */
    @keyframes fadeIn {
@@ -188,4 +211,78 @@
             themeToggle.textContent = 'Toggle Light Mode';
         }
     }
+    
+    const audioPlayer = document.getElementById('audio-player');
+        let currentlyPlaying = null;
+        let currentButton = null;
+
+        async function togglePlay(trackId) {
+            const button = document.querySelector(`[data-track-id="${trackId}"] .play-button`);
+            
+            // If clicking the same track that's currently playing
+            if (currentlyPlaying === trackId) {
+                if (audioPlayer.paused) {
+                    audioPlayer.play();
+                    button.textContent = 'Pause';
+                    button.classList.add('playing');
+                } else {
+                    audioPlayer.pause();
+                    button.textContent = 'Play';
+                    button.classList.remove('playing');
+                }
+                return;
+            }
+
+            // Reset previous button if exists
+            if (currentButton) {
+                currentButton.textContent = 'Play';
+                currentButton.classList.remove('playing');
+            }
+
+            // Update current button
+            button.textContent = 'Loading...';
+            
+            try {
+                // Fetch the audio snippet from your Django view
+                const response = await fetch(`/get-audio-snippet/${trackId}/`);
+                if (!response.ok) throw new Error('Failed to fetch audio');
+                
+                const audioBlob = await response.blob();
+                const audioUrl = URL.createObjectURL(audioBlob);
+                
+                // Update audio player
+                audioPlayer.src = audioUrl;
+                audioPlayer.play();
+                
+                // Update UI
+                button.textContent = 'Pause';
+                button.classList.add('playing');
+                
+                // Update tracking variables
+                currentlyPlaying = trackId;
+                currentButton = button;
+                
+                // Clean up old audio URL if it exists
+                if (audioPlayer.dataset.currentUrl) {
+                    URL.revokeObjectURL(audioPlayer.dataset.currentUrl);
+                }
+                audioPlayer.dataset.currentUrl = audioUrl;
+
+            } catch (error) {
+                console.error('Error playing track:', error);
+                button.textContent = 'Error';
+                setTimeout(() => {
+                    button.textContent = 'Play';
+                }, 2000);
+            }
+        }
+
+        // Handle audio ending
+        audioPlayer.addEventListener('ended', () => {
+            if (currentButton) {
+                currentButton.textContent = 'Play';
+                currentButton.classList.remove('playing');
+                currentlyPlaying = null;
+            }
+        });
 </script>

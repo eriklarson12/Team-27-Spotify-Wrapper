@@ -25,6 +25,11 @@
             border-radius: 20px;
             cursor: pointer;
         }
+        .audio-player {
+            width: 100%;
+            margin-top: 10px;
+            color: #1DB954;
+        }
     </style>
 </head>
 <body>
@@ -37,8 +42,12 @@
     <div class="slide">
         <h2>Your Top Tracks Are...</h2>
         <ul>
-            {% for track in top_tracks %}
+            {% for track, preview_url in top_tracks %}
                 <li>{{ track }}</li>
+                <audio controls class="audio-player">
+                    <source src="{{ preview_url }}" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
             {% endfor %}
         </ul>
     </div>
