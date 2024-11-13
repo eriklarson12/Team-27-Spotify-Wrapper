@@ -131,7 +131,8 @@ def get_top_tracks(request):
         return []
 
     tracks = response.json().get("items", [])
-    return [(track["name"], track["preview_url"]) for track in tracks]
+    return [(track["name"], track.get("preview_url", None)) for track in tracks]
+
 
 
 # Function to get top artists

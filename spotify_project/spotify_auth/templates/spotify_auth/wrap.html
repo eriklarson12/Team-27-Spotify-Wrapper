@@ -1,38 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Spotify Wrapped</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #191414;
-            color: #ffffff;
-            text-align: center;
-        }
-        .slide {
-            display: none;
-        }
-        .active {
-            display: block;
-        }
-        .button {
-            padding: 10px 20px;
-            background-color: #1DB954;
-            color: #ffffff;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-        }
-        .audio-player {
-            width: 100%;
-            margin-top: 10px;
-            color: #1DB954;
-        }
-    </style>
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block title %}
+Your Spotify Wrapped
+{% endblock %}
+
+{% block content %}
     <!-- Slides -->
     <div class="slide active">
         <h1>Welcome to Your Spotify Wrapped</h1>
@@ -44,10 +16,14 @@
         <ul>
             {% for track, preview_url in top_tracks %}
                 <li>{{ track }}</li>
-                <audio controls class="audio-player">
-                    <source src="{{ preview_url }}" type="audio/mpeg">
-                    Your browser does not support the audio element.
-                </audio>
+                {% if preview_url %}
+                    <audio controls class="audio-player">
+                        <source src="{{ preview_url }}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                {% else %}
+                    <p>No preview available</p>
+                {% endif %}
             {% endfor %}
         </ul>
     </div>
@@ -84,16 +60,52 @@
     <!-- Navigation Button -->
     <button id="next-button" class="button">Next</button>
 
-    <script>
-        const slides = document.querySelectorAll('.slide');
-        let currentSlide = 0;
+    <!-- Custom Styles -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #191414;
+            color: #ffffff;
+            text-align: center;
+        }
 
-        document.getElementById('next-button').addEventListener('click', () => {
-            slides[currentSlide].classList.remove('active');
-            currentSlide = (currentSlide + 1) % slides.length;
-            slides[currentSlide].classList.add('active');
-        });
-    </script>
+        .slide {
+            display: none;
+        }
+        
 
-</body>
-</html>
+        .active {
+            display: block;
+        }
+
+        .button {
+            padding: 10px 20px;
+            background-color: #1DB954;
+            color: #ffffff;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .audio-player {
+            width: 100%;
+            margin-top: 10px;
+            color: #1DB954;
+        }
+    </style>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    const slides = document.querySelectorAll('.slide');
+    let currentSlide = 0;
+
+    document.getElementById('next-button').addEventListener('click', () => {
+        slides[currentSlide].classList.remove('active');
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].classList.add('active');
+    });
+</script>
+{% endblock %}
