@@ -53,10 +53,15 @@ def logout(request):
     # Redirect to home page
     return redirect('home')
 
+
 def spotify_callback(request):
+    # Check for error parameter which Spotify sends when user denies access
+    if request.GET.get('error'):
+        return redirect('home')
+
     code = request.GET.get("code")
     if not code:
-        return JsonResponse({"error": "Authorization code not provided."}, status=400)
+        return redirect('home')  # Redirect to home instead of showing error JSON
 
     token_url = "https://accounts.spotify.com/api/token"
     auth_header = base64.b64encode(
@@ -84,7 +89,7 @@ def spotify_callback(request):
         request.session['refresh_token'] = refresh_token
         return redirect('profile')
     else:
-        return JsonResponse({"error": "Failed to retrieve access token."}, status=400)
+        return redirect('home')  # Redirect to home instead of showing error JSON
 
 
 def refresh_access_token(session):
