@@ -7,6 +7,10 @@ import base64
 import urllib.parse
 from django.shortcuts import render, redirect
 
+from urllib.parse import quote
+from django.http import HttpResponse
+from django.conf import settings
+
 
 def index(request):
     """
@@ -30,10 +34,24 @@ def spotify_login(request):
         "response_type": "code",
         "redirect_uri": settings.SPOTIFY_REDIRECT_URI,
         "scope": "user-read-private user-read-email user-top-read",  # Added user-top-read scope
+        "show_dialog": "true"
     }
     # Redirect to Spotify's login page
     return redirect(f"{auth_url}?{urllib.parse.urlencode(params)}")
 
+
+def logout(request):
+    """
+    Clear session data and redirect to home page
+    """
+    # Clear all session data
+    request.session.flush()
+
+    # Invalidate any existing Spotify authorization by modifying the login URL
+    request.session['force_login'] = True
+
+    # Redirect to home page
+    return redirect('home')
 
 def spotify_callback(request):
     code = request.GET.get("code")

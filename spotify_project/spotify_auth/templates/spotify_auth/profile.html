@@ -25,6 +25,22 @@
             padding: 10px 20px;
             background-color: #1DB954;
         }
+        
+        .logout-button {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: #e74c3c;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+
+        .logout-button:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+        }
 
         .theme-toggle-button {
             background-color: white;
@@ -67,8 +83,12 @@
         }
 
         .actions {
-            text-align: center;
-            margin-top: 20px;
+            {#text-align: center;#}
+            {#margin-top: 20px;#}
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
         }
 
         .spotify-button {
@@ -85,12 +105,15 @@
         .spotify-button:hover {
             background-color: #1ed760;
         }
+        
+        
     </style>
 </head>
 <body>
 
     <div class="top-bar">
         <button id="theme-toggle" class="theme-toggle-button">Toggle Dark Mode</button>
+        <a href="{% url 'logout' %}" class="logout-button">Log Out</a>
     </div>
 
     <h1>Your Spotify Profile</h1>
