@@ -10,7 +10,25 @@ from django.shortcuts import render, redirect
 from urllib.parse import quote
 from django.http import HttpResponse
 from django.conf import settings
-
+from django.contrib.auth.models import User
+from django.contrib.auth import login
+from .models import SpotifyProfile
+from django.contrib.auth import logout as auth_logout
+from collections import Counter
+import secrets
+import string
+import requests
+from django.conf import settings
+from django.http import JsonResponse
+import base64
+import urllib.parse
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.contrib.auth import login
+from .models import SpotifyProfile
+from django.contrib.auth import logout as auth_logout
 
 def index(request):
     """
@@ -47,11 +65,17 @@ def logout(request):
     # Clear all session data
     request.session.flush()
 
+    # Logout Django user
+    auth_logout(request)
+
     # Invalidate any existing Spotify authorization by modifying the login URL
     request.session['force_login'] = True
 
     # Redirect to home page
     return redirect('home')
+
+
+
 
 
 def spotify_callback(request):
@@ -61,7 +85,7 @@ def spotify_callback(request):
 
     code = request.GET.get("code")
     if not code:
-        return redirect('home')  # Redirect to home instead of showing error JSON
+        return redirect('home')
 
     token_url = "https://accounts.spotify.com/api/token"
     auth_header = base64.b64encode(
@@ -84,13 +108,57 @@ def spotify_callback(request):
         access_token = response_data["access_token"]
         refresh_token = response_data.get("refresh_token")
 
-        # Store both tokens in the session
+        # Store tokens in session
         request.session['access_token'] = access_token
         request.session['refresh_token'] = refresh_token
-        return redirect('profile')
-    else:
-        return redirect('home')  # Redirect to home instead of showing error JSON
 
+        # Get user profile from Spotify
+        spotify_user = get_spotify_user_data(access_token)
+
+        if spotify_user:
+            # Check if we already have a user with this Spotify ID
+            try:
+                spotify_profile = SpotifyProfile.objects.get(spotify_id=spotify_user['id'])
+                user = spotify_profile.user
+            except SpotifyProfile.DoesNotExist:
+                # Create new user and profile
+                username = f"spotify_{spotify_user['id']}"
+                email = spotify_user.get('email', '')
+
+                # Generate a secure random password
+                alphabet = string.ascii_letters + string.digits
+                password = ''.join(secrets.choice(alphabet) for i in range(32))
+
+                # Create Django user
+                user = User.objects.create_user(
+                    username=username,
+                    email=email,
+                    password=password  # Using our secure random password
+                )
+
+                # Create Spotify profile
+                spotify_profile = SpotifyProfile.objects.create(
+                    user=user,
+                    spotify_id=spotify_user['id'],
+                    spotify_email=email,
+                    refresh_token=refresh_token
+                )
+
+            # Log the user in
+            login(request, user)
+            return redirect('profile')
+
+    return redirect('home')
+
+
+def get_spotify_user_data(access_token):
+    """Helper function to get user data from Spotify"""
+    headers = {"Authorization": f"Bearer {access_token}"}
+    response = requests.get("https://api.spotify.com/v1/me", headers=headers)
+
+    if response.status_code == 200:
+        return response.json()
+    return None
 
 def refresh_access_token(session):
     refresh_token = session.get('refresh_token')
@@ -142,6 +210,14 @@ def profile(request):
                             status=profile_response.status_code)
 
     profile_data = profile_response.json()
+
+    # Add Django user data to context
+    context = {
+        "profile": profile_data,
+        "django_user": request.user,
+        "spotify_profile": request.user.spotifyprofile
+    }
+
     return render(request, 'spotify_auth/profile.html', {"profile": profile_data})
 
 
