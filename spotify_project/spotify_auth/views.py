@@ -14,6 +14,11 @@ def index(request):
     """
     return render(request, 'spotify_auth/index.html')
 
+def home(request):
+    """
+    View for the home/landing page
+    """
+    return render(request, 'spotify_auth/home.html')
 
 def spotify_login(request):
     # Spotify OAuth endpoint
