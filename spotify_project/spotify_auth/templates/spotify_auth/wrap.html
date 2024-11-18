@@ -55,16 +55,69 @@
 <div class="slide">
     <h2 class="text-3xl font-bold text-center mb-6">Thank You for Listening!</h2>
     <p class="text-center">See you next year with more music insights!</p>
-</div>
 
-{% if not is_saved_wrap %}
-<div class="fixed bottom-4 right-4">
-    <button id="saveWrapButton" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
-        Save This Wrap
-    </button>
+    {% if not is_saved_wrap %}
+        <div>
+            <button id="saveWrapButton" class="button">
+                Save This Wrap
+            </button>
+        </div>
+    {% endif %}
 </div>
-{% endif %}
+    
+<!-- Navigation Button -->
+<button id="next-button" class="button next-button">Next</button>
 
+
+
+
+    
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #191414;
+        color: #ffffff;
+        text-align: center;
+    }
+    .slide {
+        display: none;
+        opacity: 100%;
+        transition: opacity 1s ease; /* Smooth transition for opacity */
+    }
+    .active {
+        display: block;
+    }
+    .button {
+        padding: 10px 20px;
+        background-color: #1DB954;
+        color: #ffffff;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+    }
+    .audio-player {
+        width: 100%;
+        margin-top: 10px;
+        color: #1DB954;
+    }
+    
+    .next-button {
+    position: fixed;
+    bottom: 40px; /* Adjust this value to move the button up from the bottom */
+    left: 50%;
+    transform: translateX(-50%); /* Center horizontally */
+    padding: 15px 30px; /* Increase padding to make the button larger */
+    font-size: 18px; /* Increase font size */
+    background-color: #1DB954;
+    color: #ffffff;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    }
+
+
+</style>
+    
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const saveButton = document.getElementById('saveWrapButton');
@@ -94,6 +147,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    const slides = document.querySelectorAll('.slide');
+    let currentSlide = 0;
+
+    document.getElementById('next-button').addEventListener('click', () => {
+        slides[currentSlide].classList.remove('active');
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].classList.add('active');
+    });
 });
 </script>
 
