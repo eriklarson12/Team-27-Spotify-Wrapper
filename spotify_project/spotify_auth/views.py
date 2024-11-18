@@ -29,6 +29,19 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login
 from .models import SpotifyProfile
 from django.contrib.auth import logout as auth_logout
+from django.contrib.auth.decorators import login_required  # Add this import at the top
+from collections import Counter
+import requests
+from django.conf import settings
+from django.http import JsonResponse
+import base64
+import urllib.parse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse
+from django.contrib.auth.models import User
+from django.contrib.auth import login
+from .models import SpotifyProfile, SpotifyWrap  # Add SpotifyWrap to imports
+from django.contrib.auth import logout as auth_logout
 
 def index(request):
     """
@@ -447,22 +460,102 @@ def get_listening_time(request):
     })
 
 
-def spotify_wrap(request):
-    top_tracks = get_top_tracks(request)
-    top_artists = get_top_artists(request)
-    top_genre = get_top_genre(request)
-    new_artists_count = new_artists_discovered(request)
-    personality_insights = get_personality_insights(request)
-
-    context = {
-        "top_tracks": top_tracks,
-        "top_artists": top_artists,
-        "top_genre": top_genre,
-        "new_artists_count": new_artists_count,
-        "personality_insights": personality_insights,
-    }
-
-    return render(request, 'spotify_auth/wrap.html', context)
 
 def get_spotify_headers(access_token):
     return {"Authorization": f"Bearer {access_token}"}
+
+
+
+@login_required
+def view_saved_wraps(request):
+    """View all saved wraps for the current user"""
+    wraps = SpotifyWrap.objects.filter(user=request.user)
+    return render(request, 'spotify_auth/saved_wraps.html', {'wraps': wraps})
+
+
+@login_required
+def view_wrap(request, wrap_id):
+    """View a specific saved wrap"""
+    wrap = get_object_or_404(SpotifyWrap, id=wrap_id, user=request.user)
+    context = {
+        'top_tracks': wrap.top_tracks,
+        'top_artists': wrap.top_artists,
+        'top_genre': wrap.top_genre,
+        'new_artists_count': wrap.new_artists_count,
+        'personality_insights': wrap.personality_insights,
+        'created_at': wrap.created_at,
+        'is_saved_wrap': True
+    }
+    return render(request, 'spotify_auth/wrap.html', context)
+
+
+# views.py
+
+@login_required
+def spotify_wrap(request):
+    """Generate and display a new Spotify wrap"""
+    try:
+        top_tracks = get_top_tracks(request)
+        top_artists = get_top_artists(request)
+        top_genre = get_top_genre(request)
+        new_artists_count = new_artists_discovered(request)
+        personality_insights = get_personality_insights(request)
+
+        context = {
+            "top_tracks": top_tracks,
+            "top_artists": top_artists,
+            "top_genre": top_genre,
+            "new_artists_count": new_artists_count,
+            "personality_insights": personality_insights,
+            "is_saved_wrap": False
+        }
+
+        return render(request, 'spotify_auth/wrap.html', context)
+    except Exception as e:
+        print(f"Error generating wrap: {str(e)}")
+        return redirect('profile')
+
+
+@login_required
+def save_wrap(request):
+    """Save the current Spotify wrap data"""
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+
+    try:
+        # Get the data
+        top_tracks = get_top_tracks(request)
+        top_artists = get_top_artists(request)
+        top_genre = get_top_genre(request)
+        new_artists_count = new_artists_discovered(request)
+        personality_insights = get_personality_insights(request)
+
+        # Print debug information
+        print(f"Saving wrap for user: {request.user.username}")
+        print(f"Top tracks: {top_tracks}")
+        print(f"Top artists: {top_artists}")
+        print(f"Top genre: {top_genre}")
+        print(f"New artists count: {new_artists_count}")
+
+        # Create the wrap object
+        wrap = SpotifyWrap.objects.create(
+            user=request.user,
+            top_tracks=top_tracks,
+            top_artists=top_artists,
+            top_genre=top_genre,
+            new_artists_count=new_artists_count,
+            personality_insights=personality_insights if isinstance(personality_insights, str) else str(
+                personality_insights)
+        )
+
+        return JsonResponse({
+            'status': 'success',
+            'wrap_id': wrap.id,
+            'message': 'Wrap saved successfully!'
+        })
+    except Exception as e:
+        print(f"Error saving wrap: {str(e)}")
+        return JsonResponse({
+            'status': 'error',
+            'message': f'Error saving wrap: {str(e)}'
+        }, status=500)

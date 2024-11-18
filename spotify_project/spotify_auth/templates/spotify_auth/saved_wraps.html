@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Your Saved Wraps{% endblock %}
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">Your Saved Wraps</h1>
+    
+    {% if wraps %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% for wrap in wraps %}
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold mb-3">Wrap from {{ wrap.created_at|date:"F j, Y" }}</h2>
+                <p class="mb-2">Top Genre: {{ wrap.top_genre }}</p>
+                <p class="mb-4">New Artists: {{ wrap.new_artists_count }}</p>
+                <a href="{% url 'view_wrap' wrap.id %}" 
+                   class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+                    View Details
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-lg">You haven't saved any wraps yet.</p>
+    {% endif %}
+</div>
+{% endblock %}
