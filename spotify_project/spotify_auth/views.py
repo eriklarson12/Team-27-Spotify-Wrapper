@@ -55,6 +55,9 @@ def home(request):
     """
     return render(request, 'spotify_auth/home.html')
 
+def team(request):
+    return render(request, 'spotify_auth/team.html')
+
 def spotify_login(request):
     # Spotify OAuth endpoint
     auth_url = "https://accounts.spotify.com/authorize"
