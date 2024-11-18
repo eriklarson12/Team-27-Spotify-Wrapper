@@ -559,3 +559,40 @@ def save_wrap(request):
             'status': 'error',
             'message': f'Error saving wrap: {str(e)}'
         }, status=500)
+
+
+# In views.py
+from django.contrib import messages
+from django.http import JsonResponse
+
+@login_required
+def delete_wrap(request, wrap_id):
+    """Delete a specific saved wrap"""
+    try:
+        # Find the wrap and ensure it belongs to the current user
+        wrap = get_object_or_404(SpotifyWrap, id=wrap_id, user=request.user)
+
+        # Delete the wrap
+        wrap.delete()
+
+        # If it's an AJAX request, return JSON response
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Wrap deleted successfully!'
+            })
+
+        # For non-AJAX requests, add a message and redirect
+        messages.success(request, 'Wrap deleted successfully!')
+        return redirect('view_saved_wraps')
+
+    except Exception as e:
+        # Handle any errors
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'status': 'error',
+                'message': f'Error deleting wrap: {str(e)}'
+            }, status=500)
+
+        messages.error(request, f'Error deleting wrap: {str(e)}')
+        return redirect('view_saved_wraps')

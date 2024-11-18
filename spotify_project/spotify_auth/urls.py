@@ -22,4 +22,5 @@ urlpatterns = [
     path('view-wrap/<int:wrap_id>/', views.view_wrap, name='view_wrap'),
     path('spotify-wrap/', views.spotify_wrap, name='spotify_wrap'),
     path('save-wrap/', views.save_wrap, name='save_wrap'),
+    path('delete_wrap/<int:wrap_id>/', views.delete_wrap, name='delete_wrap'),
 ]
