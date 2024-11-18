@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact the Developers</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            background-color: #121212;
+            color: white;
+        }
+
+        .developer-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        h1 {
+            color: #1DB954;
+            margin-bottom: 40px;
+        }
+
+        h3 {
+            color: #1DB954;
+            margin-bottom: 10px;
+        }
+
+        .email {
+            color: #1DB954;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            line-height: 1.6;
+        }
+
+        .back-button {
+            display: inline-block;
+            background: #1DB954;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 25px;
+            margin-top: 20px;
+        }
+
+        .back-button:hover {
+            background: #1ed760;
+        }
+    </style>
+</head>
+<body>
+    <h1>Contact the Developers</h1>
+
+    <div class="developer-section">
+        <h3>Marcos San Miguel</h3>
+        <div class="email">marcosasanmiguel@gmail.com</div>
+        <div class="description">
+            Involved in the development of most of the backend functionality of the website, as well as a portion of the front end.
+        </div>
+    </div>
+
+    <div class="developer-section">
+        <h3>Developer 2</h3>
+        <div class="email">developer2@email.com</div>
+        <div class="description">
+            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+        </div>
+    </div>
+
+    <div class="developer-section">
+        <h3>Developer 3</h3>
+        <div class="email">developer3@email.com</div>
+        <div class="description">
+            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+        </div>
+    </div>
+
+    <div class="developer-section">
+        <h3>Developer 4</h3>
+        <div class="email">developer4@email.com</div>
+        <div class="description">
+            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+        </div>
+    </div>
+
+    <div class="developer-section">
+        <h3>Developer 5</h3>
+        <div class="email">developer5@email.com</div>
+        <div class="description">
+            Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.
+        </div>
+    </div>
+
+    <a href="{% url 'home' %}" class="back-button">Back to Home</a>
+</body>
+</html>
