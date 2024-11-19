@@ -468,6 +468,31 @@ def get_spotify_headers(access_token):
     return {"Authorization": f"Bearer {access_token}"}
 
 
+def get_share_urls(request, wrap_data):
+    """Generate sharing URLs for various social media platforms"""
+
+    # Create base message for sharing
+    base_message = f"Check out my Spotify Wrapped!\n\n" \
+                   f"🎵 Top Genre: {wrap_data['top_genre']}\n" \
+                   f"🎸 Top Artist: {wrap_data['top_artists'][0] if wrap_data['top_artists'] else 'N/A'}\n" \
+                   f"🎼 New Artists Discovered: {wrap_data['new_artists_count']}\n" \
+                   f"#SpotifyWrapped"
+
+    # Get the full URL to the wrap
+    wrap_url = request.build_absolute_uri()
+
+    # Generate platform-specific URLs
+    twitter_text = urllib.parse.quote(base_message)
+    twitter_url = f"https://twitter.com/intent/tweet?text={twitter_text}&url={urllib.parse.quote(wrap_url)}"
+
+    linkedin_text = urllib.parse.quote(base_message)
+    linkedin_url = f"https://www.linkedin.com/sharing/share-offsite/?url={urllib.parse.quote(wrap_url)}&summary={linkedin_text}"
+
+    return {
+        'twitter_url': twitter_url,
+        'linkedin_url': linkedin_url,
+    }
+
 
 @login_required
 def view_saved_wraps(request):
@@ -489,6 +514,11 @@ def view_wrap(request, wrap_id):
         'created_at': wrap.created_at,
         'is_saved_wrap': True
     }
+
+    # Generate sharing URLs
+    share_urls = get_share_urls(request, context)
+    context.update(share_urls)
+
     return render(request, 'spotify_auth/wrap.html', context)
 
 
@@ -512,6 +542,10 @@ def spotify_wrap(request):
             "personality_insights": personality_insights,
             "is_saved_wrap": False
         }
+
+        # Generate sharing URLs
+        share_urls = get_share_urls(request, context)
+        context.update(share_urls)
 
         return render(request, 'spotify_auth/wrap.html', context)
     except Exception as e:

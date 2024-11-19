@@ -63,6 +63,20 @@
             </button>
         </div>
     {% endif %}
+    <div class="share-buttons-container mt-4 flex justify-center gap-4">
+        <button onclick="shareToTwitter()" class="share-button twitter-button">
+            Share to X
+        </button>
+        <button onclick="shareToLinkedIn()" class="share-button linkedin-button">
+            Share on LinkedIn
+        </button>
+        <button onclick="shareToWhatsApp()" class="share-button whatsapp-button">
+            Share on WhatsApp
+        </button>
+        <button onclick="shareToTumblr()" class="share-button tumblr-button">
+            Share on Tumblr
+        </button>
+    </div>
 </div>
     
 <!-- Navigation Button -->
@@ -115,6 +129,45 @@
     cursor: pointer;
     }
 
+    .share-buttons-container {
+        margin-top: 20px;
+    }
+
+    .share-button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: opacity 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .share-button:hover {
+        opacity: 0.9;
+    }
+
+    .twitter-button {
+        background-color: #000000;
+        color: #ffffff;
+    }
+
+    .linkedin-button {
+        background-color: #0A66C2;
+        color: #ffffff;
+    }
+    
+    .whatsapp-button {
+        background-color: #25D366;
+        color: #ffffff;
+    }
+    
+    .tumblr-button {
+        background-color: #34526f;
+        color: #ffffff; 
+    }
 
 </style>
     
@@ -156,6 +209,66 @@ document.addEventListener('DOMContentLoaded', function() {
         slides[currentSlide].classList.add('active');
     });
 });
+
+function shareToTwitter() {
+    const topGenre = "{{ top_genre }}";
+    const topArtist = "{{ top_artists.0 }}";
+    const newArtistsCount = "{{ new_artists_count }}";
+    const shareUrl = window.location.href;
+
+    const shareText = `🎵 My Spotify Wrapped:\n\n` +
+        `Top Genre: ${topGenre}\n` +
+        `Top Artist: ${topArtist}\n` +
+        `Discovered ${newArtistsCount} new artists this year!\n\n` +
+        `#SpotifyWrapped ${shareUrl}`;
+
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
+    window.open(twitterUrl, '_blank', 'width=550,height=420');
+}
+
+function shareToLinkedIn() {
+    const topGenre = "{{ top_genre }}";
+    const topArtist = "{{ top_artists.0 }}";
+    const newArtistsCount = "{{ new_artists_count }}";
+    const shareUrl = window.location.href;
+
+    const shareText = `Check out my Spotify Wrapped!\n\n` +
+        `🎵 Top Genre: ${topGenre}\n` +
+        `🎤 Top Artist: ${topArtist}\n` +
+        `✨ Discovered ${newArtistsCount} new artists this year!\n\n` +
+        `#SpotifyWrapped`;
+
+    const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}&summary=${encodeURIComponent(shareText)}`;
+    window.open(linkedInUrl, '_blank', 'width=550,height=420');
+}
+
+function formatShareText() {
+    const topGenre = "{{ top_genre }}";
+    const topArtist = "{{ top_artists.0 }}";
+    const newArtistsCount = "{{ new_artists_count }}";
+    const shareUrl = window.location.href;
+    
+    return `🎵 My Spotify Wrapped:\n\n` +
+           `Top Genre: ${topGenre}\n` +
+           `Top Artist: ${topArtist}\n` +
+           `Discovered ${newArtistsCount} new artists this year!\n\n` +
+           `#SpotifyWrapped`;
+}
+
+function shareToWhatsApp() {
+    const shareText = formatShareText();
+    const shareUrl = window.location.href;
+    const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + '\n' + shareUrl)}`;
+    window.open(whatsappUrl, '_blank');
+}
+
+
+function shareToTumblr() {
+    const shareText = formatShareText();
+    const shareUrl = window.location.href;
+    const tumblrUrl = `https://www.tumblr.com/share/link?url=${encodeURIComponent(shareUrl)}&title=My%20Spotify%20Wrapped&description=${encodeURIComponent(shareText)}`;
+    window.open(tumblrUrl, '_blank', 'width=550,height=420');
+}
 </script>
 
 {% endblock %}
