@@ -1,104 +1,146 @@
 {% extends "base.html" %}
 {% block title %}Your Saved Wraps{% endblock %}
 {% block content %}
-    
-    
-    <style>
-    /* Ensure centering for both desktop and mobile */
+<style>
     .wrap-container {
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
-        text-align: center;
-        margin: 0 auto; /* Center the container horizontally */
-        padding: 0 20px; /* Padding for smaller screens */
-        max-width: 1200px; /* Constrain the max width on larger screens */
+        margin: 0 auto;
+        padding: 0 20px;
+        max-width: 1200px;
     }
-    
+
     .grid-container {
         display: grid;
         gap: 20px;
         width: 100%;
     }
 
-    /* Adjustments for mobile screens */
-    @media (max-width: 768px) {
-        .wrap-container {
-            margin: 0 10px; /* Slight margin adjustment for small screens */
+    /* Responsive grid layout */
+    @media (min-width: 1024px) {
+        .grid-container {
+            grid-template-columns: repeat(3, 1fr);
         }
+    }
+
+    @media (min-width: 768px) and (max-width: 1023px) {
+        .grid-container {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 767px) {
+        .grid-container {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .card {
+        background-color: grey;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-header {
+        background-color: #4caf50;
+        color: #fff;
+        padding: 10px;
+        font-size: 1.25rem;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .card-body {
+        padding: 15px;
+    }
+
+    .card-actions {
+        margin-top: 15px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .btn {
+        padding: 10px 15px;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .btn-view {
+        background-color: #4caf50;
+        color: #fff;
+    }
+
+    .btn-view:hover {
+        background-color: #43a047;
+    }
+
+    .btn-delete {
+        background-color: #f44336;
+        color: #fff;
+    }
+
+    .btn-delete:hover {
+        background-color: #e53935;
+    }
+
+    .empty-wraps {
+        font-size: 1.2rem;
+        color: #888;
+        text-align: center;
+        margin-top: 20px;
     }
 </style>
 
-    
-    <div class="container mx-auto px-4 py-8 wrap-container">
+<div class="wrap-container">
     <h1 class="text-3xl font-bold mb-6">Your Saved Wraps</h1>
 
     {% if wraps %}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 grid-container">
+    <div class="grid-container">
         {% for wrap in wraps %}
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 relative">
-            <h2 class="text-xl font-semibold mb-3">Wrap from {{ wrap.created_at|date:"F j, Y" }}</h2>
-            <p>Top Genre: {{ wrap.top_genre }}</p>
-            <p>New Artists: {{ wrap.new_artists_count }}</p>
-
-            <div class="mt-4 flex space-x-2">
-                <a href="{% url 'view_wrap' wrap.id %}" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">View Details</a>
-                <button 
-                    data-wrap-id="{{ wrap.id }}"
-                    class="delete-wrap-btn bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
-                    Delete
-                </button>
+        <div class="card">
+            <div class="card-header">
+                Wrap from {{ wrap.created_at|date:"F j, Y" }}
+            </div>
+            <div class="card-body">
+                <p><strong>Top Genre:</strong> {{ wrap.top_genre }}</p>
+                <p><strong>New Artists:</strong> {{ wrap.new_artists_count }}</p>
+                <div class="card-actions">
+                    <a href="{% url 'view_wrap' wrap.id %}" class="btn btn-view">View Details</a>
+                    <button 
+                        data-wrap-id="{{ wrap.id }}"
+                        class="btn btn-delete delete-wrap-btn">
+                        Delete
+                    </button>
+                </div>
             </div>
         </div>
         {% endfor %}
     </div>
     {% else %}
-    <p>You haven't saved any wraps yet.</p>
+    <p class="empty-wraps">You haven't saved any wraps yet.</p>
     {% endif %}
 </div>
-    
-{#<div class="container mx-auto px-4 py-8">#}
-{#    <h1 class="text-3xl font-bold mb-6">Your Saved Wraps</h1>#}
-{##}
-{#    {% if wraps %}#}
-{#    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">#}
-{#        {% for wrap in wraps %}#}
-{#        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 relative">#}
-{#            <h2 class="text-xl font-semibold mb-3">#}
-{#                Wrap from {{ wrap.created_at|date:"F j, Y" }}#}
-{#            </h2>#}
-{#            <p>Top Genre: {{ wrap.top_genre }}</p>#}
-{#            <p>New Artists: {{ wrap.new_artists_count }}</p>#}
-{##}
-{#            <div class="mt-4 flex space-x-2">#}
-{#                <a href="{% url 'view_wrap' wrap.id %}" #}
-{#                   class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">#}
-{#                    View Details#}
-{#                </a>#}
-{#                <button #}
-{#                    data-wrap-id="{{ wrap.id }}"#}
-{#                    class="delete-wrap-btn bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">#}
-{#                    Delete#}
-{#                </button>#}
-{#            </div>#}
-{#        </div>#}
-{#        {% endfor %}#}
-{#    </div>#}
-{#    {% else %}#}
-{#    <p>You haven't saved any wraps yet.</p>#}
-{#    {% endif %}#}
-{#</div>#}
 
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const deleteButtons = document.querySelectorAll('.delete-wrap-btn');
-    
+
     deleteButtons.forEach(button => {
         button.addEventListener('click', function() {
             const wrapId = this.getAttribute('data-wrap-id');
-            
+
             if (confirm('Are you sure you want to delete this wrap?')) {
                 fetch(`/delete_wrap/${wrapId}/`, {
                     method: 'POST',
@@ -110,9 +152,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        // Remove the wrap from the DOM
-                        this.closest('.bg-white').remove();
-                        
+                        // Remove the wrap card from the DOM
+                        this.closest('.card').remove();
+
                         // Optional: Show a success message
                         alert(data.message);
                     } else {
