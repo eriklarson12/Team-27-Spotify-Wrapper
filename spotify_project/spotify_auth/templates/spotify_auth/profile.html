@@ -105,7 +105,11 @@
         .spotify-button:hover {
             background-color: #1ed760;
         }
-        
+        @media (max-width: 768px) {
+            .profile-info {
+                margin: 1rem 20px;
+            }
+        }
         
     </style>
 </head>
@@ -122,7 +126,7 @@
         <p><strong>Name:</strong> {{ profile.display_name }}</p>
         <p><strong>Email:</strong> {{ profile.email }}</p>
         <p><strong>Country:</strong> {{ profile.country }}</p>
-        <p><strong>Spotify URL:</strong> 
+        <p><strong>Spotify URL:</strong>
            <a href="{{ profile.external_urls.spotify }}">{{ profile.external_urls.spotify }}</a>
        </p>
     </div>

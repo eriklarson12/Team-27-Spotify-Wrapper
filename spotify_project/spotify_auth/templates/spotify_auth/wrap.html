@@ -4,12 +4,12 @@
 {% block content %}
 {% csrf_token %}
 
-<div class="slide active">
+<div class="slide active" data-slide="1">
     <h1 class="text-4xl font-bold text-center mb-8">Welcome to Your Spotify Wrapped</h1>
     <p>Let's see your music journey!</p>
 </div>
 
-<div class="slide">
+<div class="slide" data-slide="2">
     <h2 class="text-3xl font-bold mb-6">Your Top Tracks Are...</h2>
     {% for track, preview_url in top_tracks %}
     <div class="mb-4">
@@ -26,12 +26,12 @@
     {% endfor %}
 </div>
 
-<div class="slide">
+<div class="slide" data-slide="3">
     <h2 class="text-3xl font-bold mb-6">Your Top Genre</h2>
     <p>{{ top_genre }}</p>
 </div>
 
-<div class="slide">
+<div class="slide" data-slide="4">
     <h2 class="text-3xl font-bold mb-6">Your Top Artists Are...</h2>
     <ul>
         {% for artist in top_artists %}
@@ -40,19 +40,19 @@
     </ul>
 </div>
 
-<div class="slide">
+<div class="slide" data-slide="5">
     <h2 class="text-3xl font-bold mb-6">New Artists Discovered</h2>
     <p>You discovered {{ new_artists_count }} new artists this year!</p>
 </div>
 
-<div class="slide">
+<div class="slide" data-slide="6">
     <h2 class="text-3xl font-bold mb-6">Personality Insights</h2>
     <div class="text-lg">
         {{ personality_insights }}
     </div>
 </div>
 
-<div class="slide">
+<div class="slide" data-slide="7">
     <h2 class="text-3xl font-bold text-center mb-6">Thank You for Listening!</h2>
     <p class="text-center">See you next year with more music insights!</p>
 
@@ -78,12 +78,27 @@
         </button>
     </div>
 </div>
+{#<div>#}
+{#    <button onclick="prevSlide()" id="prev-button" class="button prev-button">Previous</button>#}
+{#    <button onclick="nextSlide()" id="next-button" class="button next-button">Next</button>#}
+{#</div>    #}
     
-<!-- Navigation Button -->
-<button id="next-button" class="button next-button">Next</button>
-
-
-
+    <div class="navigation-controls flex justify-center gap-4 mt-8">
+    <button 
+        id="prevButton" 
+        onclick="navigateSlide('prev')" 
+        class="button prevButton"
+    >
+        Previous
+    </button>
+    <button 
+        id="nextButton" 
+        onclick="navigateSlide('next')" 
+        class="button nextButton"
+    >
+        Next
+    </button>
+</div>
 
     
 <style>
@@ -115,10 +130,10 @@
         color: #1DB954;
     }
     
-    .next-button {
+    .nextButton {
     position: fixed;
     bottom: 40px; /* Adjust this value to move the button up from the bottom */
-    left: 50%;
+    left: 60%;
     transform: translateX(-50%); /* Center horizontally */
     padding: 15px 30px; /* Increase padding to make the button larger */
     font-size: 18px; /* Increase font size */
@@ -127,6 +142,23 @@
     border: none;
     border-radius: 20px;
     cursor: pointer;
+    }
+    .hidden {
+    display: none !important;
+    }
+    
+    .prevButton {
+        position: fixed;
+        bottom: 40px; /* Adjust this value to move the button up from the bottom */
+        left: 35%;
+        transform: translateX(-50%); /* Center horizontally */
+        padding: 15px 30px; /* Increase padding to make the button larger */
+        font-size: 18px; /* Increase font size */
+        background-color: #1DB954;
+        color: #ffffff;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
     }
 
     .share-buttons-container {
@@ -172,6 +204,63 @@
 </style>
     
 <script>
+
+        let currentSlide = 1;
+const totalSlides = 7;
+
+// Function to update button visibility
+function updateNavigationButtons() {
+    const prevButton = document.getElementById('prevButton');
+    const nextButton = document.getElementById('nextButton');
+    
+    // Show/hide previous button (visible on slides 2-7)
+    prevButton.classList.toggle('hidden', currentSlide === 1);
+    
+    // Show/hide next button (visible on slides 1-6)
+    nextButton.classList.toggle('hidden', currentSlide === totalSlides);
+}
+
+// Function to show specific slide
+function showSlide(slideNumber) {
+    // Hide all slides
+    document.querySelectorAll('.slide').forEach(slide => {
+        slide.classList.remove('active');
+        slide.style.display = 'none';
+    });
+    
+    // Show the target slide
+    const targetSlide = document.querySelector(`[data-slide="${slideNumber}"]`);
+    if (targetSlide) {
+        targetSlide.classList.add('active');
+        targetSlide.style.display = 'block';
+    }
+}
+
+// Function to handle navigation
+function navigateSlide(direction) {
+    if (direction === 'next' && currentSlide < totalSlides) {
+        currentSlide++;
+    } else if (direction === 'prev' && currentSlide > 1) {
+        currentSlide--;
+    }
+    
+    showSlide(currentSlide);
+    updateNavigationButtons();
+}
+
+// Initialize the page
+document.addEventListener('DOMContentLoaded', function() {
+    // Show first slide and hide others
+    document.querySelectorAll('.slide').forEach(slide => {
+        slide.style.display = 'none';
+    });
+    showSlide(1);
+    
+    // Set initial button states
+    updateNavigationButtons();
+
+});
+
 document.addEventListener('DOMContentLoaded', function() {
     const saveButton = document.getElementById('saveWrapButton');
     if (saveButton) {
@@ -208,6 +297,12 @@ document.addEventListener('DOMContentLoaded', function() {
         currentSlide = (currentSlide + 1) % slides.length;
         slides[currentSlide].classList.add('active');
     });
+    document.getElementById('prevButton').addEventListener('click', () => {
+        slides[currentSlide].classList.remove('active');
+        currentSlide = (currentSlide - 1) % slides.length;
+        slides[currentSlide].classList.add('active');
+    });
+    
 });
 
 function shareToTwitter() {
