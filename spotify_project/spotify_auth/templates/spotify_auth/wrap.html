@@ -15,13 +15,11 @@
     <div class="mb-4">
         <p>{{ track }}</p>
         {% if preview_url %}
-        <audio controls>
+            <audio class="track-audio" data-track="{{ track }}">
             <source src="{{ preview_url }}" type="audio/mpeg">
             Your browser does not support the audio element.
         </audio>
-        {% else %}
-        <p>No preview available</p>
-        {% endif %}
+    {% endif %}
     </div>
     {% endfor %}
 </div>
@@ -364,6 +362,49 @@ function shareToTumblr() {
     const tumblrUrl = `https://www.tumblr.com/share/link?url=${encodeURIComponent(shareUrl)}&title=My%20Spotify%20Wrapped&description=${encodeURIComponent(shareText)}`;
     window.open(tumblrUrl, '_blank', 'width=550,height=420');
 }
+document.addEventListener('DOMContentLoaded', function() {
+    const audioElements = document.querySelectorAll('.track-audio');
+    
+    function fadeAudio(audio, type) {
+        audio.volume = type === 'in' ? 0 : 1;
+        const fadeInterval = setInterval(() => {
+            if (type === 'in') {
+                audio.volume = Math.min(1, audio.volume + 0.1);
+                if (audio.volume >= 1) clearInterval(fadeInterval);
+            } else {
+                audio.volume = Math.max(0, audio.volume - 0.1);
+                if (audio.volume <= 0) {
+                    clearInterval(fadeInterval);
+                    audio.pause();
+                }
+            }
+        }, 100);
+    }
+    
+    function playNextTrack(currentIndex) {
+        if (currentIndex < audioElements.length) {
+            const currentAudio = audioElements[currentIndex];
+            
+            // Fade in current track
+            fadeAudio(currentAudio, 'in');
+            currentAudio.play();
+            
+            currentAudio.onended = function() {
+                // Fade out current track before playing next
+                fadeAudio(currentAudio, 'out');
+                
+                // Play next track after a short delay
+                setTimeout(() => {
+                    playNextTrack(currentIndex + 1);
+                }, 500);
+            };
+        }
+    }
+    
+    if (audioElements.length > 0) {
+        playNextTrack(0);
+    }
+});
 </script>
 
 {% endblock %}
