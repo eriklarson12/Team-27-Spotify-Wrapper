@@ -91,7 +91,30 @@ def logout(request):
     return redirect('home')
 
 
+@login_required
+def delete_account(request):
+    """Delete user account and all associated data"""
+    if request.method == 'POST':
+        try:
+            # Get the user
+            user = request.user
 
+            # Log the user out
+            auth_logout(request)
+
+            # Delete the user (this will cascade delete the SpotifyProfile due to the foreign key relationship)
+            user.delete()
+
+            # Redirect to home page with success message
+            messages.success(request, 'Your account has been successfully deleted.')
+            return redirect('home')
+
+        except Exception as e:
+            messages.error(request, f'Error deleting account: {str(e)}')
+            return redirect('profile')
+
+    # If not POST, redirect to profile
+    return redirect('profile')
 
 
 def spotify_callback(request):

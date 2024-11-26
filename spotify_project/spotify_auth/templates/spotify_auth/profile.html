@@ -24,11 +24,13 @@
             justify-content: flex-end;
             padding: 10px 20px;
             background-color: #1DB954;
+            gap: 1rem;
+            align-items: center;
         }
         
         .logout-button {
             display: inline-block;
-            padding: 0.75rem 1.5rem;
+            padding: 0.75rem 1rem;
             background-color: #e74c3c;
             color: white;
             text-decoration: none;
@@ -36,10 +38,29 @@
             font-weight: bold;
             transition: background-color 0.2s, transform 0.2s;
             margin-left: .5rem;
+            white-space: nowrap;  /* Prevents "Log Out" from breaking into two lines */
         }
 
         .logout-button:hover {
             background-color: #c0392b;
+            transform: translateY(-2px);
+        }
+        
+        .delete-account-button {
+            background-color: #dc2626;  /* Red background */
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 0.25rem;
+            border: none;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            margin-left: 1rem;  /* Add some space between logout and delete buttons */
+            display: inline-block;  /* This ensures proper spacing */
+        }
+        
+        .delete-account-button:hover {
+            background-color: #b91c1c;
             transform: translateY(-2px);
         }
 
@@ -55,6 +76,7 @@
 
         .theme-toggle-button:hover {
             background-color: #f0f0f0;
+            transform: translateY(-2px);
         }
 
         h1 {
@@ -81,6 +103,8 @@
         .profile-info a {
             color: #1DB954;
             text-decoration: none;
+            word-break: break-all;  /* Allows the URL to break at any character */
+            overflow-wrap: break-word;  /* Ensures long words break and wrap */
         }
 
         .actions {
@@ -119,6 +143,11 @@
     <div class="top-bar">
         <button id="theme-toggle" class="theme-toggle-button">Toggle Dark Mode</button>
         <a href="{% url 'logout' %}" class="logout-button">Log Out</a>
+        <form method="POST" action="{% url 'delete_account' %}" style="display: inline;"
+            onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.');">
+            {% csrf_token %}
+            <button type="submit" class="delete-account-button">Delete Account</button>
+        </form>
     </div>
 
     <h1>Your Spotify Profile</h1>
