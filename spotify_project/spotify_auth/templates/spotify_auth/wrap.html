@@ -15,18 +15,26 @@
     <div class="mb-4">
         <p>{{ track }}</p>
         {% if preview_url %}
-            <audio class="track-audio" data-track="{{ track }}">
+        <audio class="track-audio" data-track="{{ track }}">
             <source src="{{ preview_url }}" type="audio/mpeg">
             Your browser does not support the audio element.
         </audio>
-    {% endif %}
+        {% else %}
+        <p>No preview available</p>
+        {% endif %}
     </div>
     {% endfor %}
 </div>
 
 <div class="slide" data-slide="3">
-    <h2 class="text-3xl font-bold mb-6">Your Top Genre</h2>
-    <p>{{ top_genre }}</p>
+    <div class="container flex flex-col items-center justify-center text-center min-h-screen">
+        <h1>Your Top Music Genre</h1>
+        <div class="genre-name">{{ top_genre }}</div>
+        <div class="stats">
+            Found in {{ genre_count }} of your top artists<br>
+            Out of {{ total_unique_genres }} total genre mentions
+        </div>
+    </div>
 </div>
 
 <div class="slide" data-slide="4">
@@ -198,6 +206,34 @@
         background-color: #34526f;
         color: #ffffff; 
     }
+    
+    .container {
+            background-color: #282828;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+    h1 {
+            color: #1DB954;
+            margin-bottom: 10px;
+            font-size: 24px;
+    }
+        
+        .genre-name {
+            font-size: 36px;
+            margin: 20px 0;
+            text-transform: capitalize;
+        }
+        
+        .stats {
+            color: #b3b3b3;
+            font-size: 16px;
+            margin-top: 20px;
+        }
 
 </style>
     
@@ -362,9 +398,10 @@ function shareToTumblr() {
     const tumblrUrl = `https://www.tumblr.com/share/link?url=${encodeURIComponent(shareUrl)}&title=My%20Spotify%20Wrapped&description=${encodeURIComponent(shareText)}`;
     window.open(tumblrUrl, '_blank', 'width=550,height=420');
 }
+
 document.addEventListener('DOMContentLoaded', function() {
     const audioElements = document.querySelectorAll('.track-audio');
-    
+
     function fadeAudio(audio, type) {
         audio.volume = type === 'in' ? 0 : 1;
         const fadeInterval = setInterval(() => {
@@ -380,19 +417,19 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }, 100);
     }
-    
+
     function playNextTrack(currentIndex) {
         if (currentIndex < audioElements.length) {
             const currentAudio = audioElements[currentIndex];
-            
+
             // Fade in current track
             fadeAudio(currentAudio, 'in');
             currentAudio.play();
-            
+
             currentAudio.onended = function() {
                 // Fade out current track before playing next
                 fadeAudio(currentAudio, 'out');
-                
+
                 // Play next track after a short delay
                 setTimeout(() => {
                     playNextTrack(currentIndex + 1);
@@ -400,7 +437,7 @@ document.addEventListener('DOMContentLoaded', function() {
             };
         }
     }
-    
+
     if (audioElements.length > 0) {
         playNextTrack(0);
     }

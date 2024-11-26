@@ -288,7 +288,11 @@ def get_top_genre(request):
     artists = response.json().get("items", [])
     genres = [genre for artist in artists for genre in artist.get("genres", [])]
     top_genre = Counter(genres).most_common(1)
-    return top_genre[0][0] if top_genre else "Unknown"
+    return {
+        "top_genre": top_genre[0][0] if top_genre else "Unknown",
+        "genre_count": top_genre[0][1] if top_genre else 0,
+        "total_unique_genres": len(genres)
+    }
 
 
 def get_personality_insights(request):
@@ -509,6 +513,8 @@ def view_wrap(request, wrap_id):
         'top_tracks': wrap.top_tracks,
         'top_artists': wrap.top_artists,
         'top_genre': wrap.top_genre,
+        'genre_count': wrap.genre_count,
+        'total_unique_genres': wrap.total_unique_genres,
         'new_artists_count': wrap.new_artists_count,
         'personality_insights': wrap.personality_insights,
         'created_at': wrap.created_at,
@@ -530,7 +536,10 @@ def spotify_wrap(request):
     try:
         top_tracks = get_top_tracks(request)
         top_artists = get_top_artists(request)
-        top_genre = get_top_genre(request)
+        genre_data = get_top_genre(request)
+        top_genre = genre_data['top_genre']
+        genre_count = genre_data['genre_count']
+        total_unique_genres = genre_data['total_unique_genres']
         new_artists_count = new_artists_discovered(request)
         personality_insights = get_personality_insights(request)
 
@@ -538,6 +547,8 @@ def spotify_wrap(request):
             "top_tracks": top_tracks,
             "top_artists": top_artists,
             "top_genre": top_genre,
+            "genre_count": genre_count,
+            "total_unique_genres": total_unique_genres,
             "new_artists_count": new_artists_count,
             "personality_insights": personality_insights,
             "is_saved_wrap": False
@@ -563,7 +574,10 @@ def save_wrap(request):
         # Get the data
         top_tracks = get_top_tracks(request)
         top_artists = get_top_artists(request)
-        top_genre = get_top_genre(request)
+        genre_data = get_top_genre(request)
+        top_genre = genre_data['top_genre']
+        genre_count = genre_data['genre_count']
+        total_unique_genres = genre_data['total_unique_genres']
         new_artists_count = new_artists_discovered(request)
         personality_insights = get_personality_insights(request)
 

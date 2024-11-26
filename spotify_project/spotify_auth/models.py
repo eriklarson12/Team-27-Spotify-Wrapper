@@ -19,6 +19,8 @@ class SpotifyWrap(models.Model):
     top_tracks = models.JSONField()
     top_artists = models.JSONField()
     top_genre = models.CharField(max_length=255)
+    genre_count = models.IntegerField(default=0)
+    total_unique_genres = models.IntegerField(default=0)
     new_artists_count = models.IntegerField()
     personality_insights = models.TextField()
 
