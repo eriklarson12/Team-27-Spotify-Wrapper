@@ -15,6 +15,7 @@
     {% for track, preview_url in top_tracks %}
     <div class="mb-4">
         <p>{{ track }}</p>
+        <!--
         {% if preview_url %}
         <audio class="track-audio" data-track="{{ track }}">
             <source src="{{ preview_url }}" type="audio/mpeg">
@@ -23,6 +24,7 @@
         {% else %}
         <p>No preview available</p>
         {% endif %}
+        -->
     </div>
     {% endfor %}
 </div>
