@@ -161,6 +161,17 @@
        </p>
     </div>
     <div class="actions">
+        <div class="dropdown-menu">
+    <a href="{% url 'spotify_wrap' %}?time_range=short_term" class="dropdown-item">
+        Last 4 Weeks
+    </a>
+    <a href="{% url 'spotify_wrap' %}?time_range=medium_term" class="dropdown-item">
+        Last 6 Months
+    </a>
+    <a href="{% url 'spotify_wrap' %}?time_range=long_term" class="dropdown-item">
+        All Time
+    </a>
+</div>
         <a href="{% url 'spotify_wrap' %}" class="spotify-button">Generate Your Spotify Wrapped</a>
     </div>
     <div class="actions">

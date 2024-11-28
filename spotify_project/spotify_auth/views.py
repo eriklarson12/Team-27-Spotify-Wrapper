@@ -260,15 +260,14 @@ def profile(request):
     return render(request, 'spotify_auth/profile.html', {"profile": profile_data})
 
 
-# Function to get top tracks
-def get_top_tracks(request):
+def get_top_tracks(request, time_range='medium_term'):
     access_token = request.session.get('access_token')
     if not access_token:
         return []
 
     url = "https://api.spotify.com/v1/me/top/tracks"
     headers = get_spotify_headers(access_token)
-    params = {"limit": 5, "time_range": "medium_term"}
+    params = {"limit": 5, "time_range": time_range}
     response = requests.get(url, headers=headers, params=params)
     if response.status_code != 200:
         return []
@@ -276,17 +275,14 @@ def get_top_tracks(request):
     tracks = response.json().get("items", [])
     return [(track["name"], track.get("preview_url", None)) for track in tracks]
 
-
-
-# Function to get top artists
-def get_top_artists(request):
+def get_top_artists(request, time_range='medium_term'):
     access_token = request.session.get('access_token')
     if not access_token:
         return []
 
     url = "https://api.spotify.com/v1/me/top/artists"
     headers = get_spotify_headers(access_token)
-    params = {"limit": 5, "time_range": "medium_term"}
+    params = {"limit": 5, "time_range": time_range}
     response = requests.get(url, headers=headers, params=params)
     if response.status_code != 200:
         return []
@@ -294,16 +290,14 @@ def get_top_artists(request):
     artists = response.json().get("items", [])
     return [artist["name"] for artist in artists]
 
-
-# Function to get top genre
-def get_top_genre(request):
+def get_top_genre(request, time_range='medium_term'):
     access_token = request.session.get('access_token')
     if not access_token:
         return "Unknown"
 
     url = "https://api.spotify.com/v1/me/top/artists"
     headers = get_spotify_headers(access_token)
-    params = {"limit": 10, "time_range": "medium_term"}
+    params = {"limit": 10, "time_range": time_range}
     response = requests.get(url, headers=headers, params=params)
     if response.status_code != 200:
         return "Unknown"
@@ -314,11 +308,10 @@ def get_top_genre(request):
     return {
         "top_genre": top_genre[0][0] if top_genre else "Unknown",
         "genre_count": top_genre[0][1] if top_genre else 0,
-        "total_unique_genres": len(genres)
+        "total_unique_genres": len(set(genres))
     }
 
-
-def get_personality_insights(request):
+def get_personality_insights(request, t_r='medium_term'):
     from .gemini_client import GeminiClient
 
     access_token = request.session.get('access_token')
@@ -337,7 +330,7 @@ def get_personality_insights(request):
 
         params = {
             "limit": 20,  # Consistent with other views
-            "time_range": "medium_term"
+            "time_range": t_r
         }
 
         response = requests.get(top_artists_url, headers=headers, params=params)
@@ -412,7 +405,7 @@ def get_top_artists2(access_token, time_range):
 
 
 # Function to get new artists discovered
-def new_artists_discovered(request):
+def new_artists_discovered(request, time_range='medium_term'):
     access_token = request.session.get('access_token')
     if not access_token:
         return 0
@@ -420,22 +413,21 @@ def new_artists_discovered(request):
     url = "https://api.spotify.com/v1/me/top/artists"
     headers = get_spotify_headers(access_token)
 
-    # Get short-term and long-term top artists
-    short_term_response = requests.get(url, headers=headers, params={"time_range": "short_term"})
-    long_term_response = requests.get(url, headers=headers, params={"time_range": "long_term"})
+    # Get selected term and compare with a longer term
+    long_term = 'long_term' if time_range != 'long_term' else 'medium_term'
 
-    if short_term_response.status_code != 200 or long_term_response.status_code != 200:
+    selected_term_response = requests.get(url, headers=headers, params={"time_range": time_range})
+    long_term_response = requests.get(url, headers=headers, params={"time_range": long_term})
+
+    if selected_term_response.status_code != 200 or long_term_response.status_code != 200:
         return 0
 
-    short_term_artists = {artist["name"] for artist in short_term_response.json().get("items", [])}
+    selected_term_artists = {artist["name"] for artist in selected_term_response.json().get("items", [])}
     long_term_artists = {artist["name"] for artist in long_term_response.json().get("items", [])}
 
-    # New artists are those in short-term data but not in long-term data
-    new_artists = short_term_artists - long_term_artists
+    # New artists are those in selected term data but not in long-term data
+    new_artists = selected_term_artists
     return len(new_artists)
-
-
-
 
 
 def get_listening_time(request):
@@ -553,18 +545,21 @@ def view_wrap(request, wrap_id):
 
 # views.py
 
-@login_required
 def spotify_wrap(request):
     """Generate and display a new Spotify wrap"""
+    # Add time range selection, default to medium_term
+    time_range = request.GET.get('time_range', 'medium_term')
+
     try:
-        top_tracks = get_top_tracks(request)
-        top_artists = get_top_artists(request)
-        genre_data = get_top_genre(request)
+        top_tracks = get_top_tracks(request, time_range)
+        top_artists = get_top_artists(request, time_range)
+        genre_data = get_top_genre(request, time_range)
         top_genre = genre_data['top_genre']
         genre_count = genre_data['genre_count']
         total_unique_genres = genre_data['total_unique_genres']
-        new_artists_count = new_artists_discovered(request)
-        personality_insights = get_personality_insights(request)
+        new_artists_count = new_artists_discovered(request, time_range)
+        personality_insights = get_personality_insights(
+            request, time_range)  # Note: You might want to modify this to use time_range
 
         context = {
             "top_tracks": top_tracks,
@@ -574,7 +569,8 @@ def spotify_wrap(request):
             "total_unique_genres": total_unique_genres,
             "new_artists_count": new_artists_count,
             "personality_insights": personality_insights,
-            "is_saved_wrap": False
+            "is_saved_wrap": False,
+            "selected_time_range": time_range  # Pass selected time range to template
         }
 
         # Generate sharing URLs
@@ -587,39 +583,39 @@ def spotify_wrap(request):
         return redirect('profile')
 
 
+
 @login_required
 def save_wrap(request):
     """Save the current Spotify wrap data"""
     if request.method != 'POST':
         return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
 
+    # Get the time range from the POST data, with 'medium_term' as fallback
+    time_range = request.POST.get('time_range', 'medium_term')
+
     try:
-        # Get the data
-        top_tracks = get_top_tracks(request)
-        top_artists = get_top_artists(request)
-        genre_data = get_top_genre(request)
+        # Get the data using the PASSED time range, not a hardcoded default
+        top_tracks = get_top_tracks(request, time_range)
+        top_artists = get_top_artists(request, time_range)
+        genre_data = get_top_genre(request, time_range)
         top_genre = genre_data['top_genre']
         genre_count = genre_data['genre_count']
         total_unique_genres = genre_data['total_unique_genres']
-        new_artists_count = new_artists_discovered(request)
-        personality_insights = get_personality_insights(request)
+        new_artists_count = new_artists_discovered(request, time_range)
+        personality_insights = get_personality_insights(request, time_range)
 
-        # Print debug information
-        print(f"Saving wrap for user: {request.user.username}")
-        print(f"Top tracks: {top_tracks}")
-        print(f"Top artists: {top_artists}")
-        print(f"Top genre: {top_genre}")
-        print(f"New artists count: {new_artists_count}")
-
-        # Create the wrap object
+        # Create the wrap object with the PASSED time range
         wrap = SpotifyWrap.objects.create(
             user=request.user,
             top_tracks=top_tracks,
             top_artists=top_artists,
             top_genre=top_genre,
+            genre_count=genre_count,
+            total_unique_genres=total_unique_genres,
             new_artists_count=new_artists_count,
             personality_insights=personality_insights if isinstance(personality_insights, str) else str(
-                personality_insights)
+                personality_insights),
+            time_range=time_range  # Use the time range passed from frontend
         )
 
         return JsonResponse({
@@ -633,8 +629,6 @@ def save_wrap(request):
             'status': 'error',
             'message': f'Error saving wrap: {str(e)}'
         }, status=500)
-
-
 # In views.py
 from django.contrib import messages
 from django.http import JsonResponse

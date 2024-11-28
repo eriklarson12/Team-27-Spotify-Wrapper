@@ -64,14 +64,47 @@
 <div class="slide" data-slide="7">
     <h2 class="text-3xl font-bold text-center mb-6">Thank You for Listening!</h2>
     <p class="text-center">See you next year with more music insights!</p>
+<button 
+        class="time-range-btn {% if selected_time_range == 'short_term' %}active{% endif %}" 
+        data-time-range="short_term">
+        Last 4 Weeks
+    </button>
+    <button 
+        class="time-range-btn {% if selected_time_range == 'medium_term' %}active{% endif %}" 
+        data-time-range="medium_term">
+        Last 6 Months
+    </button>
+    <button 
+        class="time-range-btn {% if selected_time_range == 'long_term' %}active{% endif %}" 
+        data-time-range="long_term">
+        All Time
+    </button>
+
+    <div class="time-range-options">
+    <form id="time-range-form" method="get" action="{% url 'spotify_wrap' %}">
+        <select name="time_range" id="time_range_select" class="p-2 border rounded">
+            <option value="short_term" {% if selected_time_range == 'short_term' %}selected{% endif %}>
+                Last 4 Weeks
+            </option>
+            <option value="medium_term" {% if selected_time_range == 'medium_term' or not selected_time_range %}selected{% endif %}>
+                Last 6 Months
+            </option>
+            <option value="long_term" {% if selected_time_range == 'long_term' %}selected{% endif %}>
+                All Time
+            </option>
+        </select>
+    </form>
+</div>
 
     {% if not is_saved_wrap %}
-        <div>
-            <button id="saveWrapButton" class="button">
-                Save This Wrap
-            </button>
-        </div>
-    {% endif %}
+<div class="flex justify-center mt-4">
+    <button 
+        id="save-wrap-btn" 
+        class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
+        Save This Wrap
+    </button>
+</div>
+{% endif %}
     <div class="share-buttons-container mt-4 flex justify-center gap-4">
         <button onclick="shareToTwitter()" class="share-button twitter-button">
             Share to X
@@ -302,6 +335,12 @@
 </style>
     
 <script>
+document.getElementById('time_range_select').addEventListener('change', function() {
+    this.form.submit();
+});
+</script>
+    
+<script>
 
         let currentSlide = 1;
 const totalSlides = 7;
@@ -523,5 +562,61 @@ document.addEventListener('DOMContentLoaded', function() {
     })
 });
 </script>
+    {% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Time range selection
+    const timeRangeButtons = document.querySelectorAll('.time-range-btn');
+    let selectedTimeRange = '{{ selected_time_range }}';
+
+    timeRangeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            timeRangeButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            // Update selected time range
+            selectedTimeRange = this.dataset.timeRange;
+            
+            // Optional: Reload wrap data for the selected time range
+            window.location.href = `{% url 'spotify_wrap' %}?time_range=${selectedTimeRange}`;
+        });
+    });
+
+    // Save wrap functionality
+    const saveWrapBtn = document.getElementById('save-wrap-btn');
+    if (saveWrapBtn) {
+        saveWrapBtn.addEventListener('click', function() {
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            
+            fetch("{% url 'save_wrap' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrfToken
+                },
+                body: `time_range=${selectedTimeRange}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Wrap saved successfully!');
+                    saveWrapBtn.disabled = true;
+                    saveWrapBtn.textContent = 'Saved';
+                } else {
+                    alert('Error saving wrap: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while saving the wrap.');
+            });
+        });
+    }
+});
+</script>
+{% endblock %}
 
 {% endblock %}
