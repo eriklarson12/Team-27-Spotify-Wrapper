@@ -138,8 +138,8 @@
         
     </style>
 </head>
-<body>
 
+<body>
     <div class="top-bar">
         <button id="theme-toggle" class="theme-toggle-button">Toggle Dark Mode</button>
         <a href="{% url 'logout' %}" class="logout-button">Log Out</a>
@@ -160,59 +160,46 @@
            <a href="{{ profile.external_urls.spotify }}">{{ profile.external_urls.spotify }}</a>
        </p>
     </div>
+
+    <h2 style="text-align: center; color: #1DB954;">Generate Spotify Wrapped</h2>
     <div class="actions">
-        <div class="dropdown-menu">
-    <a href="{% url 'spotify_wrap' %}?time_range=short_term" class="dropdown-item">
-        Last 4 Weeks
-    </a>
-    <a href="{% url 'spotify_wrap' %}?time_range=medium_term" class="dropdown-item">
-        Last 6 Months
-    </a>
-    <a href="{% url 'spotify_wrap' %}?time_range=long_term" class="dropdown-item">
-        All Time
-    </a>
-</div>
-        <a href="{% url 'spotify_wrap' %}" class="spotify-button">Generate Your Spotify Wrapped</a>
+        <a href="{% url 'spotify_wrap' %}?time_range=short_term" class="spotify-button">
+            Short Term
+        </a>
+        <a href="{% url 'spotify_wrap' %}?time_range=medium_term" class="spotify-button">
+            Medium Term
+        </a>
+        <a href="{% url 'spotify_wrap' %}?time_range=long_term" class="spotify-button">
+            Long Term
+        </a>
     </div>
+
     <div class="actions">
         <a href="{% url 'view_saved_wraps' %}" class="spotify-button">View Saved Wraps</a>
     </div>
 
-        <!-- JavaScript for theme toggle -->
     <script>
         const themeToggle = document.getElementById('theme-toggle');
-        
-        // Check local storage for saved theme preference
         const savedTheme = localStorage.getItem('theme');
-        
         if (savedTheme) {
-            document.body.classList.add(savedTheme); // Apply saved theme
+            document.body.classList.add(savedTheme);
             updateButtonText(savedTheme);
         }
 
         themeToggle.addEventListener('click', function() {
-            document.body.classList.toggle('light-mode'); // Toggle between light and dark mode
-            
-            let currentTheme = 'dark-mode'; // Default is dark mode
+            document.body.classList.toggle('light-mode');
+            let currentTheme = 'dark-mode';
             if (document.body.classList.contains('light-mode')) {
                 currentTheme = 'light-mode';
             }
-            
-            // Save the current theme in local storage
             localStorage.setItem('theme', currentTheme);
-
-            // Update button text based on current theme
             updateButtonText(currentTheme);
         });
 
         function updateButtonText(theme) {
-          if (theme === 'light-mode') {
-              themeToggle.textContent = 'Toggle Dark Mode';
-          } else {
-              themeToggle.textContent = 'Toggle Light Mode';
-          }
-      }
+            themeToggle.textContent = theme === 'light-mode' ? 'Toggle Dark Mode' : 'Toggle Light Mode';
+        }
     </script>
-
 </body>
+
 </html>

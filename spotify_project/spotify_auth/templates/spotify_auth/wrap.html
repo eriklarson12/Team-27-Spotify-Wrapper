@@ -12,22 +12,23 @@
 
 <div class="slide" data-slide="2">
     <h2 class="text-3xl font-bold mb-6">Your Top Tracks Are...</h2>
-    {% for track, preview_url in top_tracks %}
-    <div class="mb-4">
-        <p>{{ track }}</p>
-        <!--
-        {% if preview_url %}
-        <audio class="track-audio" data-track="{{ track }}">
-            <source src="{{ preview_url }}" type="audio/mpeg">
-            Your browser does not support the audio element.
-        </audio>
-        {% else %}
-        <p>No preview available</p>
-        {% endif %}
-        -->
+    <div class="track-container">
+        {% for track, preview_url in top_tracks %}
+        <div class="track-card">
+            <p>{{ track }}</p>
+            {% if preview_url %}
+            <audio controls>
+                <source src="{{ preview_url }}" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+            {% else %}
+            <p>No preview available</p>
+            {% endif %}
+        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
 </div>
+
 
 <div class="slide" data-slide="3">
     <div class="container flex flex-col items-center justify-center text-center min-h-screen">
@@ -42,16 +43,18 @@
 
 <div class="slide" data-slide="4">
     <h2 class="text-3xl font-bold mb-6">Your Top Artists Are...</h2>
-    <ul>
+    <div class="artist-container">
         {% for artist in top_artists %}
-        <li>{{ artist }}</li>
+        <div class="artist-card">
+            <p class="artist-name">{{ artist }}</p>
+        </div>
         {% endfor %}
-    </ul>
+    </div>
 </div>
 
 <div class="slide" data-slide="5">
-    <h2 class="text-3xl font-bold mb-6">New Artists Discovered</h2>
-    <p>You discovered {{ new_artists_count }} new artists this year!</p>
+    <h2 class="text-3xl font-bold mb-6">Number of artists listened to:</h2>
+    <p>You listened to {{ new_artists_count }} artists!</p>
 </div>
 
 <div class="slide" data-slide="6">
@@ -64,37 +67,6 @@
 <div class="slide" data-slide="7">
     <h2 class="text-3xl font-bold text-center mb-6">Thank You for Listening!</h2>
     <p class="text-center">See you next year with more music insights!</p>
-<button 
-        class="time-range-btn {% if selected_time_range == 'short_term' %}active{% endif %}" 
-        data-time-range="short_term">
-        Last 4 Weeks
-    </button>
-    <button 
-        class="time-range-btn {% if selected_time_range == 'medium_term' %}active{% endif %}" 
-        data-time-range="medium_term">
-        Last 6 Months
-    </button>
-    <button 
-        class="time-range-btn {% if selected_time_range == 'long_term' %}active{% endif %}" 
-        data-time-range="long_term">
-        All Time
-    </button>
-
-    <div class="time-range-options">
-    <form id="time-range-form" method="get" action="{% url 'spotify_wrap' %}">
-        <select name="time_range" id="time_range_select" class="p-2 border rounded">
-            <option value="short_term" {% if selected_time_range == 'short_term' %}selected{% endif %}>
-                Last 4 Weeks
-            </option>
-            <option value="medium_term" {% if selected_time_range == 'medium_term' or not selected_time_range %}selected{% endif %}>
-                Last 6 Months
-            </option>
-            <option value="long_term" {% if selected_time_range == 'long_term' %}selected{% endif %}>
-                All Time
-            </option>
-        </select>
-    </form>
-</div>
 
     {% if not is_saved_wrap %}
 <div class="flex justify-center mt-4">
@@ -332,6 +304,134 @@
             margin-top: 20px;
         }
 
+        .slide {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    transform: translateY(20px);
+}
+
+.slide.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.welcome-container {
+    background: linear-gradient(135deg, #1DB954, #191414);
+    border-radius: 15px;
+    padding: 50px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    color: white;
+}
+
+h1, h2 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+button {
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+    background-color: #14833b;
+    transform: scale(1.05);
+}
+
+.genre-name {
+    font-size: 2rem;
+    color: #1DB954;
+    font-weight: bold;
+    text-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.track-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.track-card {
+    background-color: #282828;
+    border-radius: 8px;
+    padding: 20px;
+    width: 250px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.track-card p {
+    font-size: 1.2rem;
+    color: white;
+}
+
+.track-card audio {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.navigation-controls button {
+    font-size: 16px;
+    margin: 0 10px;
+    padding: 12px 24px;
+    border-radius: 25px;
+    background: linear-gradient(45deg, #1DB954, #14833b);
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.navigation-controls button:hover {
+    background: linear-gradient(45deg, #14833b, #1DB954);
+}
+
+.artist-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+.artist-card {
+    background-color: #282828;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 180px;
+    padding: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.artist-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+}
+
+.artist-avatar img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+    border: 3px solid #1DB954;
+}
+
+.artist-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #ffffff;
+    margin-top: 10px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.artist-avatar img:hover {
+    box-shadow: 0 0 15px #1DB954;
+}
+
+
 </style>
     
 <script>
@@ -384,6 +484,19 @@ function navigateSlide(direction) {
     showSlide(currentSlide);
     updateNavigationButtons();
 }
+
+function showSlide(slideNumber) {
+    const slides = document.querySelectorAll('.slide');
+    slides.forEach((slide, index) => {
+        slide.style.display = 'none';
+        slide.classList.remove('active');
+        if (index + 1 === slideNumber) {
+            slide.style.display = 'block';
+            setTimeout(() => slide.classList.add('active'), 50); // Delayed activation for smooth entry
+        }
+    });
+}
+
 
 // Initialize the page
 document.addEventListener('DOMContentLoaded', function() {
