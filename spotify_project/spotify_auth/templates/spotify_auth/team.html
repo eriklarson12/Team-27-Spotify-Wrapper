@@ -21,6 +21,7 @@
             padding: 20px;
             margin: 20px 0;
             text-align: left;
+            position: relative;
         }
 
         h1 {
@@ -55,6 +56,23 @@
         .back-button:hover {
             background: #1ed760;
         }
+
+        .email-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #1DB954;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .email-button:hover {
+            background: #1ed760;
+        }
     </style>
 </head>
 <body>
@@ -62,6 +80,7 @@
 
     <div class="developer-section">
         <h3>Marcos San Miguel</h3>
+        <button class="email-button" onclick="sendEmail('Marcos San Miguel', 'marcosasanmiguel@gmail.com')">Email</button>
         <div class="email">marcosasanmiguel@gmail.com</div>
         <div class="description">
             Involved in the development of most of the backend functionality of the website, as well as a portion of the front end.
@@ -70,16 +89,18 @@
 
     <div class="developer-section">
         <h3>Erik Larson</h3>
+        <button class="email-button" onclick="sendEmail('Erik Larson', 'erik.larson12@outlook.com')">Email</button>
         <div class="email">erik.larson12@outlook.com</div>
         <div class="description">
             I primarily handled the backend development, ensuring the functionality, data flow, and core logic of the application ran smoothly.
             Alongside that, I contributed to the frontend, implementing a few key visual elements to enhance the user experience. 
-            If you have questions about the technical aspects, backend processes, or frontend integrations, feel free to reach out—I’d be happy to share insights from our development journey!
+            If you have questions about the technical aspects, backend processes, or frontend integrations, feel free to reach out—I'd be happy to share insights from our development journey!
         </div>
     </div>
 
     <div class="developer-section">
         <h3>Aneegha Thithiesha Mahabaudge</h3>
+        <button class="email-button" onclick="sendEmail('Aneegha Thithiesha Mahabaudge', 'thithiesha@gmail.com')">Email</button>
         <div class="email">thithiesha@gmail.com</div>
         <div class="description">
             Contributed to the development of key backend functionality for the website, along with contributions to the frontend.
@@ -88,6 +109,7 @@
 
     <div class="developer-section">
         <h3>Samuel Hauck</h3>
+        <button class="email-button" onclick="sendEmail('Samuel Hauck', 'shauck6@gatech.edu')">Email</button>
         <div class="email">shauck6@gatech.edu</div>
         <div class="description">
             Contributed certain features such as the genre algorithm and also the depreciated feature of having your top songs playing in the background.
@@ -97,6 +119,7 @@
 
     <div class="developer-section">
         <h3>Developer 5</h3>
+        <button class="email-button" onclick="sendEmail('Developer 5', 'developer5@email.com')">Email</button>
         <div class="email">developer5@email.com</div>
         <div class="description">
             Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.
@@ -104,5 +127,22 @@
     </div>
 
     <a href="{% url 'home' %}" class="back-button">Back to Home</a>
+
+    <script>
+        function sendEmail(name, email) {
+            // Construct the mailto link
+            const subject = encodeURIComponent(`Message for ${name}`);
+            const body = encodeURIComponent(`Hello ${name},\n\n`);
+            
+            // Multiple options
+            const emailServices = [
+                `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${subject}&body=${body}`,
+                `https://outlook.office.com/mail/deeplink/compose?to=${email}&subject=${subject}&body=${body}`
+            ];
+        
+            // Open first available email service
+            window.open(emailServices[0], '_blank');
+        }
+    </script>
 </body>
 </html>
