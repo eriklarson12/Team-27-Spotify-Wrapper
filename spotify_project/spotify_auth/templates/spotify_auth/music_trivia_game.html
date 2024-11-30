@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Spotify Music Trivia{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6">
+    <h1 class="text-4xl font-bold mb-6 text-center">Spotify Music Trivia Challenge</h1>
+
+    <form method="POST" action="{% url 'submit_music_trivia' %}">
+        {% csrf_token %}
+
+        {% for question in trivia_questions %}
+        <div class="bg-white shadow-md rounded-lg p-6 mb-4">
+            {% if question.type == 'artist_match' %}
+            <h2 class="text-2xl font-semibold mb-4">Which artist performs this track?</h2>
+            <p class="text-xl mb-4 italic">"{{ question.track }}"</p>
+            
+            {% for option in question.options %}
+            <div class="mb-2">
+                <label class="inline-flex items-center">
+                    <input type="radio" name="answers" value="{{ option }}" 
+                           class="form-radio" required>
+                    <span class="ml-2">{{ option }}</span>
+                </label>
+            </div>
+            {% endfor %}
+
+            {% elif question.type == 'genre_knowledge' %}
+            <h2 class="text-2xl font-semibold mb-4">Genre Knowledge</h2>
+            <p class="text-xl mb-4">{{ question.question }}</p>
+            
+            {% for option in question.options %}
+            <div class="mb-2">
+                <label class="inline-flex items-center">
+                    <input type="radio" name="answers" value="{{ option }}" 
+                           class="form-radio" required>
+                    <span class="ml-2">{{ option }}</span>
+                </label>
+            </div>
+            {% endfor %}
+
+            {% elif question.type == 'unique_artists' %}
+            <h2 class="text-2xl font-semibold mb-4">Unique Artists Challenge</h2>
+            <p class="text-xl mb-4">{{ question.question }}</p>
+            
+            {% for option in question.options %}
+            <div class="mb-2">
+                <label class="inline-flex items-center">
+                    <input type="radio" name="answers" value="{{ option }}" 
+                           class="form-radio" required>
+                    <span class="ml-2">{{ option }}</span>
+                </label>
+            </div>
+            {% endfor %}
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <div class="text-center">
+            <button type="submit" class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600">
+                Submit Answers
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

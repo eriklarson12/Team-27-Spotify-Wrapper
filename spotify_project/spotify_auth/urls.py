@@ -25,4 +25,6 @@ urlpatterns = [
     path('spotify-wrap/', views.spotify_wrap, name='spotify_wrap'),
     path('save-wrap/', views.save_wrap, name='save_wrap'),
     path('delete_wrap/<int:wrap_id>/', views.delete_wrap, name='delete_wrap'),
+    path('music-trivia/', views.create_music_trivia_game, name='create_music_trivia_game'),
+    path('music-trivia/submit/', views.submit_music_trivia, name='submit_music_trivia')
 ]

@@ -16,6 +16,7 @@
         {% for track, preview_url in top_tracks %}
         <div class="track-card">
             <p>{{ track }}</p>
+            <!--
             {% if preview_url %}
             <audio controls>
                 <source src="{{ preview_url }}" type="audio/mpeg">
@@ -24,6 +25,7 @@
             {% else %}
             <p>No preview available</p>
             {% endif %}
+            -->
         </div>
         {% endfor %}
     </div>
@@ -90,6 +92,11 @@
         {# <button onclick="shareToTumblr()" class="share-button tumblr-button"> #}
         {#     Share on Tumblr #}
         {# </button> #}
+    </div>
+    <div class="share-buttons-container mt-4 flex justify-center gap-4">
+        <button onclick="navigateToMusicTrivia()" class="share-button whatsapp-button">
+            Play wrapped trivia!
+        </button>
     </div>
 </div>
 {#<div>#}
@@ -674,6 +681,40 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     })
 });
+
+function navigateToMusicTrivia() {
+    // Retrieve the current time range from the session or pass it to the game page
+    const timeRange = "{{ selected_time_range|default:'medium_term' }}";
+    
+    // Construct the URL with the time range as a query parameter
+    const triviaGameUrl = "{% url 'create_music_trivia_game' %}" + 
+        (timeRange ? `?time_range=${timeRange}` : '');
+    
+    // Navigate to the trivia game page
+    window.location.href = triviaGameUrl;
+}
+
+// Optional: Add event listeners to the game navigation elements
+/*document.addEventListener('DOMContentLoaded', function() {
+    // Add click event to the button in the last slide
+    const triviaButton = document.querySelector('.music-trivia-link a');
+    if (triviaButton) {
+        triviaButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            navigateToMusicTrivia();
+        });
+    }
+
+    // Add click event to navigation controls if you want to add a game navigation option
+    const navigationControls = document.querySelector('.navigation-controls');
+    if (navigationControls) {
+        const gameNavButton = document.createElement('button');
+        gameNavButton.textContent = 'Music Trivia';
+        gameNavButton.classList.add('bg-green-500', 'text-white', 'px-4', 'py-2', 'rounded-full');
+        gameNavButton.addEventListener('click', navigateToMusicTrivia);
+        navigationControls.appendChild(gameNavButton);
+    }
+});*/
 </script>
     {% block extra_js %}
 <script>

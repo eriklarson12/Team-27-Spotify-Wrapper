@@ -1,6 +1,6 @@
 from collections import Counter
 
-import requests
+import requests, random
 from django.conf import settings
 from django.http import JsonResponse
 import base64
@@ -629,7 +629,7 @@ def save_wrap(request):
             'status': 'error',
             'message': f'Error saving wrap: {str(e)}'
         }, status=500)
-# In views.py
+
 from django.contrib import messages
 from django.http import JsonResponse
 
@@ -664,3 +664,102 @@ def delete_wrap(request, wrap_id):
 
         messages.error(request, f'Error deleting wrap: {str(e)}')
         return redirect('view_saved_wraps')
+
+
+@login_required
+def create_music_trivia_game(request):
+    """Generate a music trivia game based on the user's top tracks and artists"""
+    access_token = request.session.get('access_token')
+    if not access_token:
+        return redirect('spotify_login')
+
+    # Get top tracks and artists
+    top_tracks = get_top_tracks(request)
+    top_artists = get_top_artists(request)
+
+    # Generate trivia questions
+    trivia_questions = []
+
+    # Artist Matching Question
+    if top_tracks and top_artists:
+        artist_match_question = {
+            'type': 'artist_match',
+            'question': 'Which of these artists performs the following track?',
+            'track': top_tracks[0][0],  # Use the first track name
+            'options': random.sample(top_artists + [top_tracks[0][0]], 4)  # Mix of artists and a track name
+        }
+        trivia_questions.append(artist_match_question)
+
+    # Genre Knowledge Question
+    genre_info = get_top_genre(request)
+    if genre_info:
+        genre_question = {
+            'type': 'genre_knowledge',
+            'question': f'How many of your top artists belong to the {genre_info["top_genre"]} genre?',
+            'correct_answer': genre_info['genre_count'],
+            'options': [
+                genre_info['genre_count'],
+                genre_info['genre_count'] + 1,
+                genre_info['genre_count'] - 1,
+                genre_info['genre_count'] + 2
+            ]
+        }
+        trivia_questions.append(genre_question)
+
+    # Unique Artists Question
+    unique_artists_question = {
+        'type': 'unique_artists',
+        'question': 'How many unique artists appear in your top tracks?',
+        'correct_answer': len(set([track[0] for track in top_tracks])),
+        'options': [
+            len(set([track[0] for track in top_tracks])),
+            len(set([track[0] for track in top_tracks])) + 1,
+            len(set([track[0] for track in top_tracks])) - 1,
+            len(set([track[0] for track in top_tracks])) + 2
+        ]
+    }
+    trivia_questions.append(unique_artists_question)
+
+    # Shuffle questions to randomize order
+    random.shuffle(trivia_questions)
+
+    context = {
+        'trivia_questions': trivia_questions,
+        'top_tracks': top_tracks,
+        'top_artists': top_artists
+    }
+
+    return render(request, 'spotify_auth/music_trivia_game.html', context)
+
+
+@login_required
+def submit_music_trivia(request):
+    """
+    Process trivia game submission and calculate score
+    """
+    if request.method == 'POST':
+        # Get user's answers from the form
+        user_answers = request.POST.getlist('answers')
+
+        # Retrieve original questions from session or database
+        # This is a placeholder - you'd need to implement proper session management
+        trivia_questions = request.session.get('trivia_questions', [])
+
+        score = 0
+        total_questions = len(trivia_questions)
+
+        for i, question in enumerate(trivia_questions):
+            # Compare user's answer with the correct answer
+            if str(user_answers[i]) == str(question['correct_answer']):
+                score += 1
+
+        # Save the score or do something with it
+        context = {
+            'score': score,
+            'total_questions': total_questions,
+            'percentage': (score / total_questions) * 100 if total_questions > 0 else 0
+        }
+
+        return render(request, 'spotify_auth/music_trivia_results.html', context)
+
+    return redirect('music_trivia_game')

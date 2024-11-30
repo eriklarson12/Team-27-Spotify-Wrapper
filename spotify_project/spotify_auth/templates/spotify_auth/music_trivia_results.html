@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Trivia Results{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6 text-center">
+    <h1 class="text-4xl font-bold mb-6">Your Trivia Results</h1>
+
+    <div class="bg-white shadow-md rounded-lg p-8">
+        <h2 class="text-3xl font-semibold mb-4">
+            Score: {{ score }}/{{ total_questions }}
+        </h2>
+
+        <div class="text-xl mb-6">
+            Percentage: {{ percentage|floatformat:2 }}%
+        </div>
+
+        {% if percentage >= 75 %}
+        <p class="text-green-600 font-bold">Excellent job! You're a music expert!</p>
+        {% elif percentage >= 50 %}
+        <p class="text-yellow-600 font-bold">Good effort! Keep exploring music!</p>
+        {% else %}
+        <p class="text-red-600 font-bold">Keep listening and learning!</p>
+        {% endif %}
+
+        <div class="mt-6">
+            <a href="{% url 'create_music_trivia_game' %}" class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 mr-4">
+                Play Again
+            </a>
+            <a href="{% url 'spotify_wrap' %}" class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600">
+                Back to Wrap
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
