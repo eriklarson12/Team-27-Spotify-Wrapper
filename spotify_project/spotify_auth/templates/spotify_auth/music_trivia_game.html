@@ -6,61 +6,101 @@
 <div class="container mx-auto p-6">
     <h1 class="text-4xl font-bold mb-6 text-center">Spotify Music Trivia Challenge</h1>
 
-    <form method="POST" action="{% url 'submit_music_trivia' %}">
+    <form id="triviaForm" method="POST" action="{% url 'submit_music_trivia' %}">
         {% csrf_token %}
-
+        
         {% for question in trivia_questions %}
         <div class="bg-white shadow-md rounded-lg p-6 mb-4">
             {% if question.type == 'artist_match' %}
-            <h2 class="text-2xl font-semibold mb-4">Which artist performs this track?</h2>
-            <p class="text-xl mb-4 italic">"{{ question.track }}"</p>
-            
-            {% for option in question.options %}
-            <div class="mb-2">
-                <label class="inline-flex items-center">
-                    <input type="radio" name="answers" value="{{ option }}" 
-                           class="form-radio" required>
-                    <span class="ml-2">{{ option }}</span>
+                <h2 class="text-2xl font-semibold mb-4">Which artist performs this track?</h2>
+                <p class="mb-4 italic">"{{ question.track }}"</p>
+                
+                {% for option in question.options %}
+                <label class="block mb-2">
+                    <input type="radio" 
+                           name="user_answer_{{ forloop.parentloop.counter0 }}" 
+                           value="{{ option }}" 
+                           class="mr-2"
+                           required>
+                    {{ option }}
                 </label>
-            </div>
-            {% endfor %}
+                {% endfor %}
 
             {% elif question.type == 'genre_knowledge' %}
-            <h2 class="text-2xl font-semibold mb-4">Genre Knowledge</h2>
-            <p class="text-xl mb-4">{{ question.question }}</p>
-            
-            {% for option in question.options %}
-            <div class="mb-2">
-                <label class="inline-flex items-center">
-                    <input type="radio" name="answers" value="{{ option }}" 
-                           class="form-radio" required>
-                    <span class="ml-2">{{ option }}</span>
+                <h2 class="text-2xl font-semibold mb-4">Genre Knowledge</h2>
+                <p class="mb-4">{{ question.question }}</p>
+                
+                {% for option in question.options %}
+                <label class="block mb-2">
+                    <input type="radio" 
+                           name="user_answer_{{ forloop.parentloop.counter0 }}" 
+                           value="{{ option }}" 
+                           class="mr-2"
+                           required>
+                    {{ option }}
                 </label>
-            </div>
-            {% endfor %}
+                {% endfor %}
 
             {% elif question.type == 'unique_artists' %}
-            <h2 class="text-2xl font-semibold mb-4">Unique Artists Challenge</h2>
-            <p class="text-xl mb-4">{{ question.question }}</p>
-            
-            {% for option in question.options %}
-            <div class="mb-2">
-                <label class="inline-flex items-center">
-                    <input type="radio" name="answers" value="{{ option }}" 
-                           class="form-radio" required>
-                    <span class="ml-2">{{ option }}</span>
+                <h2 class="text-2xl font-semibold mb-4">Unique Artists Challenge</h2>
+                <p class="mb-4">{{ question.question }}</p>
+                
+                {% for option in question.options %}
+                <label class="block mb-2">
+                    <input type="radio" 
+                           name="user_answer_{{ forloop.parentloop.counter0 }}" 
+                           value="{{ option }}" 
+                           class="mr-2"
+                           required>
+                    {{ option }}
                 </label>
-            </div>
-            {% endfor %}
+                {% endfor %}
             {% endif %}
         </div>
         {% endfor %}
 
         <div class="text-center">
-            <button type="submit" class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600">
+            <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
                 Submit Answers
             </button>
         </div>
     </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('triviaForm');
+    
+    form.addEventListener('submit', function(event) {
+        // Get all question groups (radio button sets)
+        const questionGroups = document.querySelectorAll('input[type="radio"][name^="user_answer_"]');
+        const groupNames = new Set();
+        
+        // Collect unique group names
+        questionGroups.forEach(input => {
+            groupNames.add(input.getAttribute('name'));
+        });
+        
+        // Validate that each group has an answer selected
+        let isValid = true;
+        groupNames.forEach(groupName => {
+            const groupInputs = document.querySelectorAll(`input[name="${groupName}"]`);
+            const isGroupAnswered = Array.from(groupInputs).some(input => input.checked);
+            
+            if (!isGroupAnswered) {
+                isValid = false;
+                // Optional: Highlight the unanswered question group
+                const questionDiv = groupInputs[0].closest('.bg-white');
+                questionDiv.classList.add('border-2', 'border-red-500');
+            }
+        });
+        
+        // Prevent form submission if validation fails
+        if (!isValid) {
+            event.preventDefault();
+            alert('Please answer all questions before submitting.');
+        }
+    });
+});
+</script>
 {% endblock %}

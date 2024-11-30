@@ -1,6 +1,7 @@
 from collections import Counter
 
-import requests, random
+import requests, random, time
+from django.contrib import messages
 from django.conf import settings
 from django.http import JsonResponse
 import base64
@@ -665,63 +666,89 @@ def delete_wrap(request, wrap_id):
         messages.error(request, f'Error deleting wrap: {str(e)}')
         return redirect('view_saved_wraps')
 
+def get_top_tracks_and_artist(request, time_range='medium_term'):
+    access_token = request.session.get('access_token')
+    if not access_token:
+        return []
+
+    url = "https://api.spotify.com/v1/me/top/tracks"
+    headers = get_spotify_headers(access_token)
+    params = {"limit": 5, "time_range": time_range}
+    response = requests.get(url, headers=headers, params=params)
+    if response.status_code != 200:
+        return []
+
+    tracks = response.json().get("items", [])
+    return [(track["name"], track.get("preview_url", None), track["artists"][0]["name"]) for track in tracks]
 
 @login_required
 def create_music_trivia_game(request):
     """Generate a music trivia game based on the user's top tracks and artists"""
+    time_range = request.GET.get('time_range', 'medium_term')
+
     access_token = request.session.get('access_token')
     if not access_token:
         return redirect('spotify_login')
 
     # Get top tracks and artists
-    top_tracks = get_top_tracks(request)
-    top_artists = get_top_artists(request)
+    top_tracks = get_top_tracks_and_artist(request, time_range)
+    top_artists = get_top_artists(request, time_range)
 
     # Generate trivia questions
     trivia_questions = []
 
     # Artist Matching Question
     if top_tracks and top_artists:
+        track_num = random.randint(0, len(top_tracks) - 1)
         artist_match_question = {
             'type': 'artist_match',
             'question': 'Which of these artists performs the following track?',
-            'track': top_tracks[0][0],  # Use the first track name
-            'options': random.sample(top_artists + [top_tracks[0][0]], 4)  # Mix of artists and a track name
+            'track': top_tracks[track_num][0],
+            'correct_answer': top_tracks[track_num][2],
+            'options': random.sample(top_artists[0:3] + [top_tracks[track_num][2]], 4)
         }
         trivia_questions.append(artist_match_question)
 
     # Genre Knowledge Question
-    genre_info = get_top_genre(request)
+    genre_info = get_top_genre(request, time_range)
+    genre_count = genre_info['genre_count']
+    num_list1 = set([genre_count])
+    while len(num_list1) < 4:
+        incorrect_answer = random.randint(max(0, genre_count - 2), genre_count + 5)
+        num_list1.add(incorrect_answer)
+    num_list1 = list(num_list1)
+    random.shuffle(num_list1)
     if genre_info:
         genre_question = {
             'type': 'genre_knowledge',
             'question': f'How many of your top artists belong to the {genre_info["top_genre"]} genre?',
-            'correct_answer': genre_info['genre_count'],
-            'options': [
-                genre_info['genre_count'],
-                genre_info['genre_count'] + 1,
-                genre_info['genre_count'] - 1,
-                genre_info['genre_count'] + 2
-            ]
+            'correct_answer': genre_count,
+            'options': num_list1
         }
         trivia_questions.append(genre_question)
 
     # Unique Artists Question
+    unique = len(set([track[0] for track in top_tracks]))
+    num_list2 = set([unique])
+    while len(num_list2) < 4:
+        incorrect_answer = random.randint(max(0, unique - 2), unique + 5)
+        num_list2.add(incorrect_answer)
+    num_list2 = list(num_list2)
+    random.shuffle(num_list2)
     unique_artists_question = {
         'type': 'unique_artists',
         'question': 'How many unique artists appear in your top tracks?',
-        'correct_answer': len(set([track[0] for track in top_tracks])),
-        'options': [
-            len(set([track[0] for track in top_tracks])),
-            len(set([track[0] for track in top_tracks])) + 1,
-            len(set([track[0] for track in top_tracks])) - 1,
-            len(set([track[0] for track in top_tracks])) + 2
-        ]
+        'correct_answer': unique,
+        'options': num_list2
     }
     trivia_questions.append(unique_artists_question)
 
     # Shuffle questions to randomize order
     random.shuffle(trivia_questions)
+
+    request.session['trivia_questions'] = trivia_questions
+    request.session['trivia_timestamp'] = int(time.time())
+    request.session.set_expiry(3600)
 
     context = {
         'trivia_questions': trivia_questions,
@@ -737,29 +764,63 @@ def submit_music_trivia(request):
     """
     Process trivia game submission and calculate score
     """
-    if request.method == 'POST':
-        # Get user's answers from the form
-        user_answers = request.POST.getlist('answers')
+    if request.method != 'POST':
+        return redirect('create_music_trivia_game')
 
-        # Retrieve original questions from session or database
-        # This is a placeholder - you'd need to implement proper session management
-        trivia_questions = request.session.get('trivia_questions', [])
+        # Retrieve questions from session
+    trivia_questions = request.session.get('trivia_questions', [])
 
-        score = 0
-        total_questions = len(trivia_questions)
+    # Check if questions exist and haven't expired
+    if not trivia_questions:
+        messages.error(request, 'Trivia session has expired. Please start a new game.')
+        return redirect('create_music_trivia_game')
 
-        for i, question in enumerate(trivia_questions):
-            # Compare user's answer with the correct answer
-            if str(user_answers[i]) == str(question['correct_answer']):
-                score += 1
+    # Validate session timestamp to prevent replay attacks
+    session_timestamp = request.session.get('trivia_timestamp', 0)
+    current_time = int(time.time())
+    if current_time - session_timestamp > 3600:  # 1-hour expiration
+        messages.error(request, 'Trivia session has expired. Please start a new game.')
+        return redirect('create_music_trivia_game')
 
-        # Save the score or do something with it
-        context = {
-            'score': score,
-            'total_questions': total_questions,
-            'percentage': (score / total_questions) * 100 if total_questions > 0 else 0
+    user_answers = [request.POST.get('user_answer_0'), request.POST.get('user_answer_1'), request.POST.get('user_answer_2')]
+
+    # Validate number of answers matches number of questions
+    if len(user_answers) != len(trivia_questions):
+        messages.error(request, 'Invalid submission. Please answer all questions.')
+        return redirect('create_music_trivia_game')
+
+    score = 0
+    total_questions = len(trivia_questions)
+    detailed_results = []
+
+    for i, question in enumerate(trivia_questions):
+        # Cast to string to ensure type consistency
+        user_answer = str(user_answers[i])
+        correct_answer = str(question['correct_answer'])
+
+        # Track detailed results for feedback
+        result = {
+            'question': question['question'],
+            'user_answer': user_answer,
+            'correct_answer': correct_answer,
+            'is_correct': user_answer == correct_answer
         }
 
-        return render(request, 'spotify_auth/music_trivia_results.html', context)
+        if user_answer == correct_answer:
+            score += 1
 
-    return redirect('music_trivia_game')
+        detailed_results.append(result)
+
+    # Clear the session to prevent replay
+    del request.session['trivia_questions']
+    del request.session['trivia_timestamp']
+
+    # Prepare context for results template
+    context = {
+        'score': score,
+        'total_questions': total_questions,
+        'percentage': (score / total_questions) * 100 if total_questions > 0 else 0,
+        'detailed_results': detailed_results
+    }
+
+    return render(request, 'spotify_auth/music_trivia_results.html', context)
