@@ -685,7 +685,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function navigateToMusicTrivia() {
     // Retrieve the current time range from the session or pass it to the game page
     const timeRange = "{{ selected_time_range|default:'medium_term' }}";
-    
+    sessionStorage.setItem('selectedTimeRange', timeRange);
     // Construct the URL with the time range as a query parameter
     const triviaGameUrl = "{% url 'create_music_trivia_game' %}" + 
         (timeRange ? `?time_range=${timeRange}` : '');
