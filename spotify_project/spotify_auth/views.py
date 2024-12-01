@@ -274,7 +274,7 @@ def get_top_tracks(request, time_range='medium_term'):
         return []
 
     tracks = response.json().get("items", [])
-    return [(track["name"], track.get("preview_url", None)) for track in tracks]
+    return [(track["name"], track.get("preview_url", None), track["album"]["images"][0]["url"] if track["album"]["images"] else None) for track in tracks]
 
 def get_top_artists(request, time_range='medium_term'):
     access_token = request.session.get('access_token')
