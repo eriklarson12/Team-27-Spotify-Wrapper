@@ -414,21 +414,32 @@ def new_artists_discovered(request, time_range='medium_term'):
     url = "https://api.spotify.com/v1/me/top/artists"
     headers = get_spotify_headers(access_token)
 
-    # Get selected term and compare with a longer term
-    long_term = 'long_term' if time_range != 'long_term' else 'medium_term'
-
+    # Get artists for the selected time range
     selected_term_response = requests.get(url, headers=headers, params={"time_range": time_range})
-    long_term_response = requests.get(url, headers=headers, params={"time_range": long_term})
+
+    # Get artists for the long-term range for comparison
+    long_term_response = requests.get(url, headers=headers, params={"time_range": "long_term"})
+
+    medium_term_response = requests.get(url, headers=headers, params={"time_range": "medium_term"})
+
+    short_term_response = requests.get(url, headers=headers, params={"time_range": "short_term"})
 
     if selected_term_response.status_code != 200 or long_term_response.status_code != 200:
         return 0
 
     selected_term_artists = {artist["name"] for artist in selected_term_response.json().get("items", [])}
     long_term_artists = {artist["name"] for artist in long_term_response.json().get("items", [])}
-
+    medium_term_artists = {artist["name"] for artist in medium_term_response.json().get("items", [])}
+    short_term_artists = {artist["name"] for artist in short_term_response.json().get("items", [])}
     # New artists are those in selected term data but not in long-term data
-    new_artists = selected_term_artists
+    if time_range == "long_term":
+        return len(long_term_artists)
+    if time_range == "medium_term":
+        new_artists = medium_term_artists - long_term_artists
+    else:
+        new_artists = short_term_artists - medium_term_artists
     return len(new_artists)
+
 
 
 def get_listening_time(request):
