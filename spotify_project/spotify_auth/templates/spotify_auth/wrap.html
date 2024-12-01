@@ -11,12 +11,14 @@
 </div>
 
 <div class="slide" data-slide="2">
-    <h2 class="text-2">Your Top Tracks Are...</h2>
+    <h2 class="text-3xl font-bold mb-6">Your Top Tracks Are...</h2>
     <div class="track-container">
-        {% for track, preview_url in top_tracks %}
+        {% for track, preview_url, image_url in top_tracks %}
         <div class="track-card">
             <p>{{ track }}</p>
-            <img src="{{ track.album.images.0.url }}" alt="{{ track.album.name }}" class="album-cover">
+            {% if image_url %}
+            <img src="{{ image_url }}" alt="{{ track.album.name }}" class="album-cover">
+            {% endif %}
             <!--
             {% if preview_url %}
             <audio controls>
@@ -35,8 +37,8 @@
 
 <div class="slide" data-slide="3">
     <div class="genre-card">
-    <h1 class="welcome-text">Your Top Music Genre</h1>
-        <div class="genre-text">{{ top_genre }}</div>
+    <h1>Your Top Music Genre</h1>
+        <div class="genre-name">{{ top_genre }}</div>
         <div class="stats">
             Found in {{ genre_count }} of your top artists<br>
             Out of {{ total_unique_genres }} total genre mentions
@@ -45,10 +47,10 @@
 </div>
 
 <div class="slide" data-slide="4">
-    <h2 class="text-2">Your Top Artists Are...</h2>
-    <div class="track-container">
+    <h2 class="text-3xl font-bold mb-6">Your Top Artists Are...</h2>
+    <div class="artist-container">
         {% for artist in top_artists %}
-        <div class="track-card">
+        <div class="artist-card">
             <p class="artist-name">{{ artist }}</p>
         </div>
         {% endfor %}
@@ -150,7 +152,7 @@
     }
     .button {
         background: linear-gradient(45deg, #1DB954, #14833b);
-        color: #ffffff;
+        color: #ffffff;;
         border: none;
         padding: 8px 16px;
         border-radius: 20px;
@@ -175,25 +177,9 @@
   }
     @media (max-width: 768px) {
         .welcome-container.welcome-card {
-            transform: scale(0.8); /* Adjust the scale factor as needed */
+            transform: scale(0.6); /* Adjust the scale factor as needed */
             transform-origin: center; /* Adjust the origin for scaling */
         }
-        .track-card {
-            width: 150px !important;
-        }
-
-        .track-card:hover {
-            animation: none !important;
-        }
-
-        .track-container {
-            gap: 5px !important;
-        }
-        
-        .genre-card {
-            transform: scale(0.6);
-        }
-
     }
 
   .welcome-text {
@@ -231,6 +217,13 @@
         text-shadow: 0 0 20px #1DB954;
       }
   }
+  
+  .album-cover {
+        width: 100px; 
+        height: auto; 
+        border-radius: 8px; 
+        margin-bottom: 10px; /* Space between image and details */
+    }
 
 
   .spotify-text {
@@ -238,10 +231,6 @@
     font-size: 4rem;
     color: #1DB954;
     margin-top: 10px;
-  }
-
-  .text-2 {
-      font-size: 3rem !important;
   }
 
   @keyframes fadeIn {
@@ -261,7 +250,6 @@
         width: 100%;
         gap: 20%;
         padding-bottom: 20px;
-        scale: 1.3;
     }
 
 
@@ -327,34 +315,11 @@
         font-size: 24px;
     }
 
-    .genre-text {
-        font-size: 6rem;
+    .genre-name {
+        font-size: 36px;
         margin: 20px 0;
-        text-transform: uppercase;
-        color: #1DB954;
-        font-weight: bolder;
-        animation: popAndSpinAnimation 6s ease-in-out infinite;
+        text-transform: capitalize;
     }
-    
-@keyframes popAndSpinAnimation {
-    0%, 40%, 60%, 100% {
-        color: #1DB954;
-        transform: scale(1) rotate(0deg);
-        text-shadow: 0 0 5px rgba(29, 185, 84, 0.5);
-    }
-    20%, 80% {
-        color: #1DB954;
-        transform: scale(1.3) rotate(0deg);
-        text-shadow: 0 0 5px rgba(29, 185, 84, 0.5);
-    }
-    45% {
-        transform: rotate(10deg);
-    }
-    55% {
-        transform: rotate(-10deg);
-    }
-    
-}
 
     .stats {
         color: #b3b3b3;
@@ -394,15 +359,18 @@
     }
 
     .genre-card {
-        display: flex;
-        flex-direction: column;
+        background-color: #282828;
+        border-radius: 8px;
+        padding: 20px;
+        width: 400px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
         justify-content: center;
-        padding-top: 25vh;
-        padding-bottom: 35vh;
-        align-items: center;
-        height: 30vh;
-        max-height: 90%;
-        border-radius: 15px;
+        gap: 20px;
+        position: fixed; 
+        top: 20%; 
+        left: 50%; 
+        transform: translate(-50%, -50%);
     }
     
     .genre-name {
@@ -420,24 +388,12 @@
     }
 
     .track-card {
-        background-color: #14833B;
+        background-color: #282828;
         border-radius: 8px;
         padding: 20px;
         width: 250px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         text-align: center;
-        font-weight: bold;
-        font-family: 'Poppins', sans-serif;
-    }
-
-    .track-card:hover {
-        animation: pulse 1.5s infinite alternate;
-    }
-    .album-cover {
-        width: 100px;
-        height: auto;
-        border-radius: 8px;
-        margin-bottom: 10px; /* Space between image and details */
     }
 
     .track-card p {
