@@ -34,7 +34,7 @@
 
 <div class="slide" data-slide="3">
     <div class="container flex flex-col items-center justify-center text-center min-h-screen">
-        <h1>Your Top Music Genre</h1>
+    <h1>Your Top Music Genre</h1>
         <div class="genre-name">{{ top_genre }}</div>
         <div class="stats">
             Found in {{ genre_count }} of your top artists<br>
@@ -60,13 +60,19 @@
 </div>
 
 <div class="slide" data-slide="6">
+    <div class="welcome-container welcome-card">
+        <h1 class="welcome-text">What does your music<br><span class="spotify-text">Say about you?</span></h1>
+    </div>
+</div>
+
+<div class="slide" data-slide="7">
     <h2 class="text-3xl font-bold mb-6">Personality Insights</h2>
     <div class="text-lg">
         {{ personality_insights }}
     </div>
 </div>
 
-<div class="slide" data-slide="7">
+<div class="slide" data-slide="8">
     <h2 class="text-3xl font-bold text-center mb-6">Thank You for Listening!</h2>
     <p class="text-center">See you next year with more music insights!</p>
 
@@ -104,13 +110,13 @@
 {#    <button onclick="nextSlide()" id="next-button" class="button next-button">Next</button>#}
 {#</div>    #}
     
-    <div class="navigation-controls flex justify-center gap-4 mt-8">
+    <div class="navigation-controls">
     <button 
         id="prevButton" 
         onclick="navigateSlide('prev')" 
         class="button prevButton"
     >
-        Previous
+        Back
     </button>
     <button 
         id="nextButton" 
@@ -142,12 +148,13 @@
         display: block;
     }
     .button {
-        padding: 10px 20px;
-        background-color: #1DB954;
-        color: #ffffff;
+        background: linear-gradient(45deg, #1DB954, #14833b);
+        color: #ffffff;;
         border: none;
+        padding: 8px 16px;
         border-radius: 20px;
         cursor: pointer;
+        font-weight: bold;
     }
     .audio-player {
         width: 100%;
@@ -162,6 +169,7 @@
     padding-bottom: 35vh;
     align-items: center;
     height: 30vh;
+    border-radius: 15px;
   }
 
   .welcome-text {
@@ -176,7 +184,7 @@
 
   .welcome-text.fade-in {
   animation: fadeIn 1.5s ease-out forwards;
-}
+  }
 
   .welcome-text, .spotify-text {
       transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
@@ -212,36 +220,26 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
-    .nextButton {
-    position: fixed;
-    bottom: 40px; /* Adjust this value to move the button up from the bottom */
-    left: 60%;
-    transform: translateX(-50%); /* Center horizontally */
-    padding: 15px 30px; /* Increase padding to make the button larger */
-    font-size: 18px; /* Increase font size */
-    background-color: #1DB954;
-    color: #ffffff;
-    border: none;
-    border-radius: 20px;
-    cursor: pointer;
-    }
-    .hidden {
-    display: none !important;
-    }
-    
-    .prevButton {
+
+    .navigation-controls {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
         position: fixed;
-        bottom: 40px; /* Adjust this value to move the button up from the bottom */
-        left: 35%;
-        transform: translateX(-50%); /* Center horizontally */
-        padding: 15px 30px; /* Increase padding to make the button larger */
-        font-size: 18px; /* Increase font size */
-        background-color: #1DB954;
-        color: #ffffff;
-        border: none;
-        border-radius: 20px;
-        cursor: pointer;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        gap: 20%;
+        padding-bottom: 20px;
     }
+
+
+
+    .hidden {
+        display: none !important;
+    }
+
 
     .share-buttons-container {
         margin-top: 20px;
@@ -272,171 +270,151 @@
         background-color: #0A66C2;
         color: #ffffff;
     }
-    
+
     .whatsapp-button {
         background-color: #25D366;
         color: #ffffff;
     }
-    
+
     .tumblr-button {
         background-color: #34526f;
-        color: #ffffff; 
+        color: #ffffff;
     }
-    
+
     .container {
-            background-color: #282828;
-            padding: 30px;
-            border-radius: 8px;
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-    h1 {
-            color: #1DB954;
-            margin-bottom: 10px;
-            font-size: 24px;
+        background-color: #282828;
+        padding: 30px;
+        border-radius: 8px;
+        text-align: center;
+        max-width: 400px;
+        width: 100%;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
-        
-        .genre-name {
-            font-size: 36px;
-            margin: 20px 0;
-            text-transform: capitalize;
-        }
-        
-        .stats {
-            color: #b3b3b3;
-            font-size: 16px;
-            margin-top: 20px;
-        }
 
-        .slide {
-    display: none;
-    opacity: 0;
-    transition: opacity 0.5s ease, transform 0.5s ease;
-    transform: translateY(20px);
-}
+    h1 {
+        color: #1DB954;
+        margin-bottom: 10px;
+        font-size: 24px;
+    }
 
-.slide.active {
-    display: block;
-    opacity: 1;
-    transform: translateY(0);
-}
+    .genre-name {
+        font-size: 36px;
+        margin: 20px 0;
+        text-transform: capitalize;
+    }
 
-.welcome-container {
-    background: linear-gradient(135deg, #1DB954, #191414);
-    border-radius: 15px;
-    padding: 50px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    color: white;
-}
+    .stats {
+        color: #b3b3b3;
+        font-size: 16px;
+        margin-top: 20px;
+    }
 
-h1, h2 {
-    font-family: 'Poppins', sans-serif;
-    font-weight: bold;
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-}
+    .slide {
+        display: none;
+        opacity: 0;
+        transition: opacity 0.5s ease, transform 0.5s ease;
+        transform: translateY(20px);
+    }
 
-button {
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
+    .slide.active {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+        height: 100%;
+    }
 
-button:hover {
-    background-color: #14833b;
-    transform: scale(1.05);
-}
 
-.genre-name {
-    font-size: 2rem;
-    color: #1DB954;
-    font-weight: bold;
-    text-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-}
 
-.track-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-}
+    h1, h2 {
+        font-family: 'Poppins', sans-serif;
+        font-weight: bold;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    }
 
-.track-card {
-    background-color: #282828;
-    border-radius: 8px;
-    padding: 20px;
-    width: 250px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    text-align: center;
-}
+    button {
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
 
-.track-card p {
-    font-size: 1.2rem;
-    color: white;
-}
+    button:hover {
+        background-color: #14833b;
+        transform: scale(1.05);
+    }
 
-.track-card audio {
-    width: 100%;
-    margin-top: 10px;
-}
+    .genre-name {
+        font-size: 2rem;
+        color: #1DB954;
+        font-weight: bold;
+        text-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    }
 
-.navigation-controls button {
-    font-size: 16px;
-    margin: 0 10px;
-    padding: 12px 24px;
-    border-radius: 25px;
-    background: linear-gradient(45deg, #1DB954, #14833b);
-    color: white;
-    border: none;
-    cursor: pointer;
-}
+    .track-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+    }
 
-.navigation-controls button:hover {
-    background: linear-gradient(45deg, #14833b, #1DB954);
-}
+    .track-card {
+        background-color: #282828;
+        border-radius: 8px;
+        padding: 20px;
+        width: 250px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
 
-.artist-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-    padding: 20px;
-}
+    .track-card p {
+        font-size: 1.2rem;
+        color: white;
+    }
 
-.artist-card {
-    background-color: #282828;
-    border-radius: 15px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-    text-align: center;
-    width: 180px;
-    padding: 20px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
+    .track-card audio {
+        width: 100%;
+        margin-top: 10px;
+    }
 
-.artist-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
-}
+    .artist-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+        padding: 20px;
+    }
 
-.artist-avatar img {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    margin-bottom: 10px;
-    border: 3px solid #1DB954;
-}
+    .artist-card {
+        background-color: #282828;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        width: 180px;
+        padding: 20px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
 
-.artist-name {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #ffffff;
-    margin-top: 10px;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
+    .artist-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+    }
 
-.artist-avatar img:hover {
-    box-shadow: 0 0 15px #1DB954;
-}
+    .artist-avatar img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        margin-bottom: 10px;
+        border: 3px solid #1DB954;
+    }
+
+    .artist-name {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #ffffff;
+        margin-top: 10px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .artist-avatar img:hover {
+        box-shadow: 0 0 15px #1DB954;
+    }
 
 
 </style>
@@ -450,7 +428,7 @@ document.getElementById('time_range_select').addEventListener('change', function
 <script>
 
         let currentSlide = 1;
-const totalSlides = 7;
+const totalSlides = 8;
 
 // Function to update button visibility
 function updateNavigationButtons() {
