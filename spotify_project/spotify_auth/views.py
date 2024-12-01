@@ -268,7 +268,7 @@ def get_top_tracks(request, time_range='medium_term'):
 
     url = "https://api.spotify.com/v1/me/top/tracks"
     headers = get_spotify_headers(access_token)
-    params = {"limit": 5, "time_range": time_range}
+    params = {"limit": 10, "time_range": time_range}
     response = requests.get(url, headers=headers, params=params)
     if response.status_code != 200:
         return []

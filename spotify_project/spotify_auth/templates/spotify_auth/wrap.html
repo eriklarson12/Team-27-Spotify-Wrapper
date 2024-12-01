@@ -16,6 +16,7 @@
         {% for track, preview_url in top_tracks %}
         <div class="track-card">
             <p>{{ track }}</p>
+            <img src="{{ track.album.images.0.url }}" alt="{{ track.album.name }}" class="album-cover">
             <!--
             {% if preview_url %}
             <audio controls>
@@ -149,7 +150,7 @@
     }
     .button {
         background: linear-gradient(45deg, #1DB954, #14833b);
-        color: #ffffff;;
+        color: #ffffff;
         border: none;
         padding: 8px 16px;
         border-radius: 20px;
@@ -174,9 +175,21 @@
   }
     @media (max-width: 768px) {
         .welcome-container.welcome-card {
-            transform: scale(0.6); /* Adjust the scale factor as needed */
+            transform: scale(0.8); /* Adjust the scale factor as needed */
             transform-origin: center; /* Adjust the origin for scaling */
         }
+        .track-card {
+            width: 150px !important;
+        }
+
+        .track-card:hover {
+            animation: none !important;
+        }
+
+        .track-container {
+            gap: 5px !important;
+        }
+
     }
 
   .welcome-text {
@@ -378,12 +391,24 @@
     }
 
     .track-card {
-        background-color: #282828;
+        background-color: #14833B;
         border-radius: 8px;
         padding: 20px;
         width: 250px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         text-align: center;
+        font-weight: bold;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .track-card:hover {
+        animation: pulse 1.5s infinite alternate;
+    }
+    .album-cover {
+        width: 100px;
+        height: auto;
+        border-radius: 8px;
+        margin-bottom: 10px; /* Space between image and details */
     }
 
     .track-card p {
