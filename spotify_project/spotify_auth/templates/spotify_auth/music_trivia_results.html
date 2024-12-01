@@ -3,34 +3,99 @@
 {% block title %}Trivia Results{% endblock %}
 
 {% block content %}
-<div class="container mx-auto p-6 text-center">
-    <h1 class="text-4xl font-bold mb-6">Your Trivia Results</h1>
+<div class="body">
+    <h1 class="page-title">Your Trivia Results</h1>
 
-    <div class="bg-white shadow-md rounded-lg p-8">
-        <h2 class="text-3xl font-semibold mb-4">
+    <div class="answer-card">
+        <h2 class="score">
             Score: {{ score }}/{{ total_questions }}
         </h2>
 
-        <div class="text-xl mb-6">
+        <div class="percent">
             Percentage: {{ percentage|floatformat:2 }}%
         </div>
 
         {% if percentage >= 75 %}
-        <p class="text-green-600 font-bold">Excellent job! You're a music expert!</p>
+        <p class="score">Excellent job! You're a music expert!</p>
         {% elif percentage >= 50 %}
-        <p class="text-yellow-600 font-bold">Good effort! Keep exploring music!</p>
+        <p class="score">Good effort! Keep exploring music!</p>
         {% else %}
-        <p class="text-red-600 font-bold">Keep listening and learning!!</p>
+        <p class="score">Keep listening and learning!</p>
         {% endif %}
 
-        <div class="mt-6">
-            <a href="{% url 'create_music_trivia_game' %}" class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 mr-4">
+        <div class="button-container">
+            <button onclick="window.location.href='{% url 'create_music_trivia_game' %}'" class="button">
                 Play Again
-            </a>
-            <a href="{% url 'spotify_wrap' %}" class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600">
+            </button>
+            <button onclick="window.location.href='{% url 'spotify_wrap' %}'" class="button">
                 Back to Wrap
-            </a>
+            </button>
         </div>
     </div>
 </div>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #191414;
+        color: #ffffff;
+        text-align: center;
+        width: 100%;
+        height: 100%;
+    }
+    
+    .page-title {
+        text-align: center;
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #1DB954; /* Spotify green */
+        margin-bottom: 2rem;
+    }
+    
+    .answer-card {
+        background-color: #181818;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        max-width: 800px; /* Maximum width (you can adjust this value) */
+        width: 100%; /* Ensure it takes full width within the max-width */
+        margin: 20px auto; /* Center the card horizontally */
+        padding: 20px;
+    }
+    
+    .score {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #1DB954;
+        margin-bottom: 1rem;
+    }
+    
+    .button-container {
+        text-align: center;
+        margin-top: 2rem;
+    }
+
+    .button {
+        background-color: #1DB954;
+        color: white;
+        font-size: 1.25rem;
+        font-weight: bold;
+        padding: 0.75rem 2rem;
+        border: none;
+        border-radius: 2rem;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .button:hover {
+        background-color: #1ed760; /* Slightly lighter green for hover */
+        transform: scale(1.05);
+    }
+    
+    .percent {
+        font-style: italic;
+        color: #b3b3b3;
+        margin-bottom: 1rem;
+    }
+    
+</style>
 {% endblock %}

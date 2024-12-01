@@ -3,71 +3,198 @@
 {% block title %}Spotify Music Trivia{% endblock %}
 
 {% block content %}
-<div class="container mx-auto p-6">
-    <h1 class="text-4xl font-bold mb-6 text-center">Spotify Music Trivia Challenge</h1>
+<div class="body">
+    <h1 class="page-title">Spotify Music Trivia Challenge</h1>
 
     <form id="triviaForm" method="POST" action="{% url 'submit_music_trivia' %}">
         {% csrf_token %}
-        
+
         {% for question in trivia_questions %}
-        <div class="bg-white shadow-md rounded-lg p-6 mb-4">
+        <div class="question-card">
             {% if question.type == 'artist_match' %}
-                <h2 class="text-2xl font-semibold mb-4">Which artist performs this track?</h2>
-                <p class="mb-4 italic">"{{ question.track }}"</p>
-                
+                <h2 class="question-title">Which artist performs this track?</h2>
+                <p class="track-name">"{{ question.track }}"</p>
+
                 {% for option in question.options %}
-                <label class="block mb-2">
-                    <input type="radio" 
-                           name="user_answer_{{ forloop.parentloop.counter0 }}" 
-                           value="{{ option }}" 
-                           class="mr-2"
+                <label class="option">
+                    <input type="radio"
+                           name="user_answer_{{ forloop.parentloop.counter0 }}"
+                           value="{{ option }}"
                            required>
-                    {{ option }}
+                    <span class="option-text">{{ option }}</span>
                 </label>
                 {% endfor %}
 
             {% elif question.type == 'genre_knowledge' %}
-                <h2 class="text-2xl font-semibold mb-4">Genre Knowledge</h2>
-                <p class="mb-4">{{ question.question }}</p>
-                
+                <h2 class="question-title">Genre Knowledge</h2>
+                <p class="question-text">{{ question.question }}</p>
+
                 {% for option in question.options %}
-                <label class="block mb-2">
-                    <input type="radio" 
-                           name="user_answer_{{ forloop.parentloop.counter0 }}" 
-                           value="{{ option }}" 
-                           class="mr-2"
+                <label class="option">
+                    <input type="radio"
+                           name="user_answer_{{ forloop.parentloop.counter0 }}"
+                           value="{{ option }}"
                            required>
-                    {{ option }}
+                    <span class="option-text">{{ option }}</span>
                 </label>
                 {% endfor %}
 
             {% elif question.type == 'unique_artists' %}
-                <h2 class="text-2xl font-semibold mb-4">Unique Artists Challenge</h2>
-                <p class="mb-4">{{ question.question }}</p>
-                
+                <h2 class="question-title">Unique Artists Challenge</h2>
+                <p class="question-text">{{ question.question }}</p>
+
                 {% for option in question.options %}
-                <label class="block mb-2">
-                    <input type="radio" 
-                           name="user_answer_{{ forloop.parentloop.counter0 }}" 
-                           value="{{ option }}" 
-                           class="mr-2"
+                <label class="option">
+                    <input type="radio"
+                           name="user_answer_{{ forloop.parentloop.counter0 }}"
+                           value="{{ option }}"
                            required>
-                    {{ option }}
+                    <span class="option-text">{{ option }}</span>
                 </label>
                 {% endfor %}
             {% endif %}
         </div>
         {% endfor %}
 
-        <div class="text-center">
-            <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                Submit Answers
-            </button>
+        <div class="submit-container">
+            <button type="submit" class="submit-button">Submit Answers</button>
         </div>
     </form>
 </div>
 
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #191414;
+        color: #ffffff;
+        text-align: center;
+        width: 100%;
+        height: 100%;
+    }
+    
+
+    /* Page Title */
+    .page-title {
+        text-align: center;
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #1DB954; /* Spotify green */
+        margin-bottom: 2rem;
+    }
+
+    /* Question Card */
+    .question-card {
+        background-color: #181818;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        max-width: 800px; /* Maximum width (you can adjust this value) */
+        width: 100%; /* Ensure it takes full width within the max-width */
+        margin: 20px auto; /* Center the card horizontally */
+        padding: 20px;
+    }
+
+    /* Question Titles */
+    .question-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #1DB954;
+        margin-bottom: 1rem;
+    }
+
+    .track-name, .question-text {
+        font-style: italic;
+        color: #b3b3b3;
+        margin-bottom: 1rem;
+    }
+
+    /* Options */
+    .option {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #222;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+        position: relative;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        text-align: center;
+    }
+
+    .option input[type="radio"] {
+        display: none; /* Hide the radio button */
+    }
+
+    .option-text {
+        color: #b3b3b3;
+        font-size: 1rem;
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+
+    .option:hover {
+        background-color: #333;
+        transform: scale(1.02);
+    }
+
+    .option.selected {
+        background-color: #1DB954; /* Spotify green for selected state */
+        color: black; /* Text color for selected state */
+    }
+    
+    /* Submit Button */
+    .submit-container {
+        text-align: center;
+        margin-top: 2rem;
+    }
+
+    .submit-button {
+        background-color: #1DB954;
+        color: white;
+        font-size: 1.25rem;
+        font-weight: bold;
+        padding: 0.75rem 2rem;
+        border: none;
+        border-radius: 2rem;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .submit-button:hover {
+        background-color: #1ed760; /* Slightly lighter green for hover */
+        transform: scale(1.05);
+    }
+    
+</style>
+
 <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const options = document.querySelectorAll('.option');
+
+    options.forEach(option => {
+        option.addEventListener('click', () => {
+            // Remove "selected" class from all options in the same group
+            const groupName = option.querySelector('input[type="radio"]').name;
+            const groupOptions = document.querySelectorAll(`input[name="${groupName}"]`);
+            groupOptions.forEach(input => {
+                const parentOption = input.closest('.option');
+                parentOption.classList.remove('selected');
+                parentOption.querySelector('.option-text').style.color = ""; // Reset text color
+            });
+
+            // Add "selected" class to the clicked option
+            option.classList.add('selected');
+            const optionText = option.querySelector('.option-text');
+            optionText.style.color = "black";
+
+            // Select the hidden radio button
+            const radioButton = option.querySelector('input[type="radio"]');
+            radioButton.checked = true;
+        });
+    });
+});
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('triviaForm');
     

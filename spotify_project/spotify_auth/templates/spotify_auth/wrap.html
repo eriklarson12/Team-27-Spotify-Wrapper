@@ -33,7 +33,7 @@
 
 
 <div class="slide" data-slide="3">
-    <div class="container flex flex-col items-center justify-center text-center min-h-screen">
+    <div class="genre-card">
     <h1>Your Top Music Genre</h1>
         <div class="genre-name">{{ top_genre }}</div>
         <div class="stats">
@@ -348,6 +348,21 @@
         transform: scale(1.05);
     }
 
+    .genre-card {
+        background-color: #282828;
+        border-radius: 8px;
+        padding: 20px;
+        width: 400px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        justify-content: center;
+        gap: 20px;
+        position: fixed; 
+        top: 20%; 
+        left: 50%; 
+        transform: translate(-50%, -50%);
+    }
+    
     .genre-name {
         font-size: 2rem;
         color: #1DB954;
