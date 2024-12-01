@@ -11,14 +11,11 @@
 </div>
 
 <div class="slide" data-slide="2">
-    <h2 class="text-2">Your Top Tracks Are...</h2>
+    <h2 class="text-2" id="top-songs">Your Top Tracks Are...</h2>
     <div class="track-container">
         {% for track, preview_url, image_url in top_tracks %}
         <div class="track-card">
             <p>{{ track }}</p>
-            {% if image_url %}
-            <img src="{{ image_url }}" alt="{{ track.album.name }}" class="album-cover">
-            {% endif %}
         </div>
         {% endfor %}
     </div>
@@ -48,8 +45,12 @@
 </div>
 
 <div class="slide" data-slide="5">
-    <h2 class="text-3xl font-bold mb-6">Number of artists listened to:</h2>
-    <p>You listened to {{ new_artists_count }} artists!</p>
+    <div class="number-container">
+        <h2 class="text-2">Number of artists listened to:</h2>
+        <h1>You listened to</h1>
+        <div class="big-number">{{ new_artists_count }}</div>
+        <h1>artists!</h1>
+    </div>
 </div>
 
 <div class="slide" data-slide="6">
@@ -59,9 +60,11 @@
 </div>
 
 <div class="slide" data-slide="7">
-    <h2 class="text-3xl font-bold mb-6">Personality Insights</h2>
-    <div class="text-lg">
-        {{ personality_insights }}
+    <div class="insight-container">
+        <h2 class="text-2 insights-text">Personality Insights</h2>
+        <div class="scrollable">
+            {{ personality_insights }}
+        </div>
     </div>
 </div>
 
@@ -71,8 +74,8 @@
 
     {% if not is_saved_wrap %}
 <div class="flex justify-center mt-4">
-    <button 
-        id="save-wrap-btn" 
+    <button
+        id="save-wrap-btn"
         class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
         Save This Wrap
     </button>
@@ -102,25 +105,25 @@
 {#    <button onclick="prevSlide()" id="prev-button" class="button prev-button">Previous</button>#}
 {#    <button onclick="nextSlide()" id="next-button" class="button next-button">Next</button>#}
 {#</div>    #}
-    
+
     <div class="navigation-controls">
-    <button 
-        id="prevButton" 
-        onclick="navigateSlide('prev')" 
+    <button
+        id="prevButton"
+        onclick="navigateSlide('prev')"
         class="button prevButton"
     >
         Back
     </button>
-    <button 
-        id="nextButton" 
-        onclick="navigateSlide('next')" 
+    <button
+        id="nextButton"
+        onclick="navigateSlide('next')"
         class="button nextButton"
     >
         Next
     </button>
 </div>
 
-    
+
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -154,7 +157,53 @@
         margin-top: 10px;
         color: #1DB954;
     }
-    
+
+    .scrollable {
+        height: 500px; /* Set a fixed height */
+        overflow-y: auto; /* Enable vertical scrolling */
+        padding: 10px; /* Optional: adds some inner spacing */
+        font-size: 24pt;
+        max-width: 85%;
+    }
+    @
+    .insight-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding-top: 5vh;
+        align-items: center;
+        max-height: 90%;
+        border-radius: 15px;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .insights-text {
+        animation: pulse 1.5s infinite alternate;
+        font-size: 4rem;
+    }
+
+    .number-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding-top: 25vh;
+        padding-bottom: 35vh;
+        align-items: center;
+        height: 30vh;
+        max-height: 90%;
+        border-radius: 15px;
+    }
+
+    .big-number{
+        font-size: 25rem;
+        font-weight: bold;
+        text-align: center;
+        text-transform: uppercase;
+        color: #1DB954;
+        animation: popAndSpinAnimation 6s ease-in-out infinite;
+    }
+
+
     .welcome-container {
     display: flex;
     justify-content: center;
@@ -167,23 +216,43 @@
   }
     @media (max-width: 768px) {
         .welcome-container.welcome-card {
-            transform: scale(0.8); /* Adjust the scale factor as needed */
+            transform: scale(0.5); /* Adjust the scale factor as needed */
             transform-origin: center; /* Adjust the origin for scaling */
-        }
-        .track-card {
-            width: 150px !important;
+
         }
 
         .track-card:hover {
-            animation: none !important;
+            animation: none !important
         }
 
         .track-container {
+            transform: scale(0.8);
+            transform-origin: center;
             gap: 5px !important;
         }
         
+        #top-songs {
+            transform: scale(0.8);
+            transform-origin: center;
+        }
+
         .genre-card {
             transform: scale(0.6);
+        }
+
+        .number-container {
+            transform: scale(0.6);
+        }
+
+        .active {
+            transform: scale(0.6);
+            transform-origin: center;
+
+        }
+
+        .insight-container {
+            transform: scale(0.5);
+            transform-origin: center;
         }
 
     }
@@ -327,7 +396,7 @@
         font-weight: bolder;
         animation: popAndSpinAnimation 6s ease-in-out infinite;
     }
-    
+
 @keyframes popAndSpinAnimation {
     0%, 40%, 60%, 100% {
         color: #1DB954;
@@ -345,7 +414,7 @@
     55% {
         transform: rotate(-10deg);
     }
-    
+
 }
 
     .stats {
@@ -396,7 +465,7 @@
         max-height: 90%;
         border-radius: 15px;
     }
-    
+
     .genre-name {
         font-size: 2rem;
         color: #1DB954;
