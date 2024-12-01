@@ -56,8 +56,13 @@
 </div>
 
 <div class="slide" data-slide="5">
-    <h2 class="text-3xl font-bold mb-6">Number of artists listened to:</h2>
-    <p>You listened to {{ new_artists_count }} artists!</p>
+    <div class="number-container">
+        <h2 class="text-2">Number of artists listened to:</h2>
+        <h1>You listened to</h1>
+        <div class ="number-text">{{ new_artists_count }}</div>
+        <h1>artists!</h1>
+    </div>
+
 </div>
 
 <div class="slide" data-slide="6">
@@ -173,6 +178,19 @@
     max-height: 90%;
     border-radius: 15px;
   }
+
+    .number-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding-top: 25vh;
+        padding-bottom: 35vh;
+        align-items: center;
+        height: 30vh;
+        max-height: 90%;
+        border-radius: 15px;
+    }
+
     @media (max-width: 768px) {
         .welcome-container.welcome-card {
             transform: scale(0.8); /* Adjust the scale factor as needed */
@@ -189,9 +207,14 @@
         .track-container {
             gap: 5px !important;
         }
-        
+
         .genre-card {
             transform: scale(0.6);
+        }
+
+        .number-container {
+            transform: scale(0.6);
+            transform-origin: center;
         }
 
     }
@@ -205,6 +228,14 @@
     letter-spacing: 2px;
     line-height: 1.2;
     scale: 1.3;
+  }
+
+  .number-text {
+    font-size: 25rem;
+    display: block;
+    color: #1DB954;
+    animation: pulse ease-in-out;
+    font-weight: bolder;
   }
 
   .welcome-text.fade-in {
@@ -335,7 +366,7 @@
         font-weight: bolder;
         animation: popAndSpinAnimation 6s ease-in-out infinite;
     }
-    
+
 @keyframes popAndSpinAnimation {
     0%, 40%, 60%, 100% {
         color: #1DB954;
@@ -353,7 +384,7 @@
     55% {
         transform: rotate(-10deg);
     }
-    
+
 }
 
     .stats {
