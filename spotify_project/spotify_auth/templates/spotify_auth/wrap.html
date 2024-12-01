@@ -69,26 +69,26 @@
 </div>
 
 <div class="slide" data-slide="8">
-    <h2 class="text-3xl font-bold text-center mb-6">Thank You for Listening!</h2>
+    <h2 class="text-2">Thank You for Listening!</h2>
     <p class="text-center">See you next year with more music insights!</p>
 
     {% if not is_saved_wrap %}
 <div class="flex justify-center mt-4">
     <button
         id="save-wrap-btn"
-        class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
+        class="button">
         Save This Wrap
     </button>
 </div>
 {% endif %}
     <div class="share-buttons-container mt-4 flex justify-center gap-4">
-        <button onclick="shareToTwitter()" class="share-button twitter-button">
+        <button onclick="shareToTwitter()" class="button">
             Share to X
         </button>
         {# <button onclick="shareToLinkedIn()" class="share-button linkedin-button"> #}
         {#     Share on LinkedIn #}
         {# </button> #}
-        <button onclick="shareToWhatsApp()" class="share-button whatsapp-button">
+        <button onclick="shareToWhatsApp()" class="button">
             Share on WhatsApp
         </button>
         {# <button onclick="shareToTumblr()" class="share-button tumblr-button"> #}
@@ -96,7 +96,7 @@
         {# </button> #}
     </div>
     <div class="share-buttons-container mt-4 flex justify-center gap-4">
-        <button onclick="navigateToMusicTrivia()" class="share-button whatsapp-button">
+        <button onclick="navigateToMusicTrivia()" class="button">
             Play wrapped trivia!
         </button>
     </div>
@@ -165,12 +165,11 @@
         font-size: 24pt;
         max-width: 85%;
     }
-    @
+
     .insight-container {
         display: flex;
         flex-direction: column;
         justify-content: center;
-        padding-top: 5vh;
         align-items: center;
         max-height: 90%;
         border-radius: 15px;
@@ -226,11 +225,13 @@
         }
 
         .track-container {
-            transform: scale(0.8);
+            transform: scale(0.8) translateY(-10%);
             transform-origin: center;
             gap: 5px !important;
+            overflow-y: auto;
+            max-height: 80%;
         }
-        
+
         #top-songs {
             transform: scale(0.8);
             transform-origin: center;
