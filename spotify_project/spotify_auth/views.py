@@ -686,14 +686,11 @@ def get_top_tracks_and_artist(request, time_range='medium_term'):
 @login_required
 def create_music_trivia_game(request):
     """Generate a music trivia game based on the user's top tracks and artists"""
-    print("GET time_range:", request.GET.get('time_range'))
-    print("Session time_range:", request.session.get('time_range'))
 
     time_range = request.session.get('selected_time_range',
                                      request.GET.get('time_range', 'medium_term'))
     request.session['time_range'] = time_range
 
-    print("Selected time_range:", time_range)
 
     access_token = request.session.get('access_token')
     if not access_token:
