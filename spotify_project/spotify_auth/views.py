@@ -573,7 +573,8 @@ def spotify_wrap(request):
             "new_artists_count": new_artists_count,
             "personality_insights": personality_insights,
             "is_saved_wrap": False,
-            "time_range": time_range  # Pass selected time range to template
+            "selected_time_range": time_range,
+            # "time_range": time_range  # Pass selected time range to template
         }
 
         # Generate sharing URLs
