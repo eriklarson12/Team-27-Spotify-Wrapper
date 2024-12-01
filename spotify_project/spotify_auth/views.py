@@ -549,7 +549,9 @@ def view_wrap(request, wrap_id):
 def spotify_wrap(request):
     """Generate and display a new Spotify wrap"""
     # Add time range selection, default to medium_term
-    time_range = request.GET.get('time_range', 'medium_term')
+    time_range = request.GET.get('time_range', request.session.get('selected_time_range', 'medium_term'))
+
+    request.session['selected_time_range'] = time_range
 
     try:
         top_tracks = get_top_tracks(request, time_range)
@@ -571,7 +573,7 @@ def spotify_wrap(request):
             "new_artists_count": new_artists_count,
             "personality_insights": personality_insights,
             "is_saved_wrap": False,
-            "selected_time_range": time_range  # Pass selected time range to template
+            "time_range": time_range  # Pass selected time range to template
         }
 
         # Generate sharing URLs
@@ -684,7 +686,11 @@ def get_top_tracks_and_artist(request, time_range='medium_term'):
 @login_required
 def create_music_trivia_game(request):
     """Generate a music trivia game based on the user's top tracks and artists"""
-    time_range = request.GET.get('time_range', 'medium_term')
+
+    time_range = request.session.get('selected_time_range',
+                                     request.GET.get('time_range', 'medium_term'))
+    request.session['time_range'] = time_range
+
 
     access_token = request.session.get('access_token')
     if not access_token:
@@ -753,7 +759,8 @@ def create_music_trivia_game(request):
     context = {
         'trivia_questions': trivia_questions,
         'top_tracks': top_tracks,
-        'top_artists': top_artists
+        'top_artists': top_artists,
+        'time_range': time_range
     }
 
     return render(request, 'spotify_auth/music_trivia_game.html', context)
@@ -764,6 +771,8 @@ def submit_music_trivia(request):
     """
     Process trivia game submission and calculate score
     """
+    time_range = request.GET.get('time_range', 'medium_term')
+
     if request.method != 'POST':
         return redirect('create_music_trivia_game')
 
@@ -820,7 +829,8 @@ def submit_music_trivia(request):
         'score': score,
         'total_questions': total_questions,
         'percentage': (score / total_questions) * 100 if total_questions > 0 else 0,
-        'detailed_results': detailed_results
+        'detailed_results': detailed_results,
+        'time_range': time_range
     }
 
     return render(request, 'spotify_auth/music_trivia_results.html', context)
