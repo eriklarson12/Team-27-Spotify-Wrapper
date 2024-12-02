@@ -37,11 +37,12 @@
     }
 
     .card {
-        background-color: grey;
-        border-radius: 10px;
+        background-color: #14833B;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-        transition: transform 0.2s, box-shadow 0.2s;
+        text-align: center;
+        font-weight: bold;
+        font-family: 'Poppins', sans-serif;
+        border-radius: 5%;
     }
 
     .card:hover {
@@ -100,10 +101,50 @@
         text-align: center;
         margin-top: 20px;
     }
+    
+    .text-2 {
+        font-size: 3rem !important;
+        font-family: 'Poppins', sans-serif;
+    }
+    
+    .triangle {
+        width: 0;
+        height: 0;
+        border-left: 50px solid transparent;
+        border-right: 50px solid transparent;
+        border-bottom: 100px solid rgba(255, 255, 0, 0.8);
+        position: absolute;
+        transform: scale(11) translateY(60px) rotate(70deg) translateX(2px) translateZ(0px);
+        z-index: -1;
+        left: 0;
+    }
+
+    .triangle2 {
+        border-bottom: 100px solid rgba(121, 10, 240, 0.8) !important;
+        transform: scale(11) translateY(-0px) rotate(-110deg) translateX(2px) translateZ(0px) !important;
+        left: inherit;
+        right: 0;
+        top: 0;
+    }
+
+    .circle {
+        width: 100px;
+        height: 100px;
+        background-color: red;
+        position: absolute;
+        border-radius: 50%;
+        z-index: -1;
+        bottom: 0;
+        right: 0;
+        transform: scale(6);
+    }
 </style>
+    <div class="circle"></div>
+    <div class="triangle"></div>
+    <div class="triangle triangle2"></div>
 
 <div class="wrap-container">
-    <h1 class="text-3xl font-bold mb-6">Your Saved Wraps</h1>
+    <h1 class="text-2">Your Saved Wraps</h1>
 
     {% if wraps %}
     <div class="grid-container">
