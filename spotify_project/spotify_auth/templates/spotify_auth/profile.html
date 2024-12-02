@@ -57,6 +57,7 @@
             padding-top: 5px;
             padding-bottom: 5px;
             text-decoration: none;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 1) !important;
         }
         .generate-wrap-text:hover {
             animation: pulse 1.5s infinite alternate;
@@ -138,6 +139,55 @@
         gap: 20%;
         padding-bottom: 20px;
     }
+
+    .triangle {
+        width: 0;
+        height: 0;
+        border-left: 50px solid transparent;
+        border-right: 50px solid transparent;
+        border-bottom: 100px solid rgba(255, 255, 0, 0.8);
+        position: absolute;
+        transform: scale(11) translateY(60px) rotate(70deg) translateX(2px) translateZ(0px);
+        z-index: -1;
+        left: 0;
+    }
+
+    .triangle2 {
+        border-bottom: 100px solid rgba(121, 10, 240, 0.8) !important;
+        transform: scale(11) translateY(-0px) rotate(-110deg) translateX(2px) translateZ(0px) !important;
+        left: inherit;
+        right: 0;
+        top: 0;
+    }
+
+    .circle {
+        width: 100px;
+        height: 100px;
+        background-color: red;
+        position: absolute;
+        border-radius: 50%;
+        z-index: -1;
+        bottom: 0;
+        right: 0;
+        transform: scale(6);
+    }
+
+    @media (max-width: 768px) {
+        .center-container {
+            transform: scale(0.8);
+            transform-origin: center;
+            top: 0;
+            left: 0;
+        }
+
+        .button {
+            font-size: 6px !important;
+        }
+
+        .top-bar {
+            font-size: 6px !important;
+        }
+    }
         
     </style>
 </head>
@@ -153,6 +203,9 @@
             <button type="submit" class="button">Delete Account</button>
         </form>
     </div>
+    <div class="circle"></div>
+    <div class="triangle"></div>
+    <div class="triangle triangle2"></div>
     <div class="center-container">
         <div class="profile-title">Generate Your Wraps</div>
 
