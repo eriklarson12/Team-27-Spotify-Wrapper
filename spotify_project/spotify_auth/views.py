@@ -1,54 +1,23 @@
-from collections import Counter
-
-import requests, random, time
-from django.contrib import messages
-from django.conf import settings
-from django.http import JsonResponse
 import base64
-import urllib.parse
-from django.shortcuts import render, redirect
-
-from urllib.parse import quote
-from django.http import HttpResponse
-from django.conf import settings
-from django.contrib.auth.models import User
-from django.contrib.auth import login
-from .models import SpotifyProfile
-from django.contrib.auth import logout as auth_logout
-from collections import Counter
+import random
 import secrets
 import string
-import requests
-from django.conf import settings
-from django.http import JsonResponse
-import base64
+import time
 import urllib.parse
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from django.conf import settings
-from django.contrib.auth.models import User
-from django.contrib.auth import login
-from .models import SpotifyProfile
-from django.contrib.auth import logout as auth_logout
-from django.contrib.auth.decorators import login_required  # Add this import at the top
 from collections import Counter
+
 import requests
 from django.conf import settings
-from django.http import JsonResponse
-import base64
-import urllib.parse
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
-from django.contrib.auth.models import User
+from django.contrib import messages
 from django.contrib.auth import login
-from .models import SpotifyProfile, SpotifyWrap  # Add SpotifyWrap to imports
 from django.contrib.auth import logout as auth_logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.http import JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
 
-def index(request):
-    """
-    View for the home/landing page
-    """
-    return render(request, 'spotify_auth/index.html')
+from .models import SpotifyProfile, SpotifyWrap
+
 
 def home(request):
     """
@@ -251,13 +220,6 @@ def profile(request):
 
     profile_data = profile_response.json()
 
-    # Add Django user data to context
-    context = {
-        "profile": profile_data,
-        "django_user": request.user,
-        "spotify_profile": request.user.spotifyprofile
-    }
-
     return render(request, 'spotify_auth/profile.html', {"profile": profile_data})
 
 
@@ -387,25 +349,6 @@ def get_personality_insights(request, t_r='medium_term'):
             'error': f'An error occurred: {str(e)}'
         }, status=500)
 
-def get_top_artists2(access_token, time_range):
-    url = 'https://api.spotify.com/v1/me/top/artists'
-    headers = {
-        'Authorization': f'Bearer {access_token}'
-    }
-    params = {
-        'limit': 50,
-        'time_range': time_range  # Can be 'medium_term' or 'long_term'
-    }
-    response = requests.get(url, headers=headers, params=params)
-    if response.status_code == 200:
-        data = response.json()
-        return [artist['name'] for artist in data['items']]
-    return []
-
-
-
-
-# Function to get new artists discovered
 def new_artists_discovered(request, time_range='medium_term'):
     access_token = request.session.get('access_token')
     if not access_token:
@@ -644,9 +587,6 @@ def save_wrap(request):
             'status': 'error',
             'message': f'Error saving wrap: {str(e)}'
         }, status=500)
-
-from django.contrib import messages
-from django.http import JsonResponse
 
 @login_required
 def delete_wrap(request, wrap_id):

@@ -10,38 +10,40 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
-from pathlib import Path
-from dotenv import load_dotenv
 import os
+from pathlib import Path
 
-# Gemini code
-# Load environment variables
-load_dotenv()
+from django.core.exceptions import ImproperlyConfigured
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv(BASE_DIR / '.env')
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
+
+def env(name, default=None, required=False):
+    value = os.environ.get(name, default)
+    if required and not value:
+        raise ImproperlyConfigured(f'Set the {name} environment variable. See .env.example.')
+    return value
+
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = env('SECRET_KEY', required=True)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
+DEBUG = env('DEBUG', default='False').lower() in ('1', 'true', 'yes')
 
-ALLOWED_HOSTS = []
-
-import os
+ALLOWED_HOSTS = [h.strip() for h in env('ALLOWED_HOSTS', default='').split(',') if h.strip()]
 
 # Spotify API credentials
-SPOTIFY_CLIENT_ID = os.getenv('SPOTIFY_CLIENT_ID')
-SPOTIFY_CLIENT_SECRET = os.getenv('SPOTIFY_CLIENT_SECRET')
-SPOTIFY_REDIRECT_URI = 'http://127.0.0.1:8000/spotify/callback/'
+SPOTIFY_CLIENT_ID = env('SPOTIFY_CLIENT_ID', required=True)
+SPOTIFY_CLIENT_SECRET = env('SPOTIFY_CLIENT_SECRET', required=True)
+SPOTIFY_REDIRECT_URI = env('SPOTIFY_REDIRECT_URI', default='http://127.0.0.1:8000/spotify/callback/')
 
 # Gemini API settings
-GOOGLE_GEMINI_API_KEY = os.getenv('GOOGLE_GEMINI_API_KEY')
+GOOGLE_GEMINI_API_KEY = env('GOOGLE_GEMINI_API_KEY', required=True)
 
 # Application definition
 
@@ -135,3 +137,5 @@ STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
